@@ -1,3 +1,6 @@
+from __future__ import division
+
+import numbers
 from screen import Screen
 
 class Layout(object):
@@ -13,3 +16,27 @@ class Layout(object):
 		self.root.render_boundary_right_bottom = self.screen.terminal_size
 
 		self.root.render(self)
+
+	def calcRelativeSize(self, size, total):
+		# Maybe just absolute integer?
+		if isinstance(size, numbers.Integral):
+			return size
+
+		# If it isn't a string, what can it be?
+		if not isinstance(size, str):
+			raise ValueError
+
+		# Maybe this is a str(int) ?
+		try:
+			return int(size)
+		except ValueError:
+			pass
+
+		# Percent?
+		try:
+			if size.endswith("%"):
+				return float(size[:-1]) / 100 * total
+		except ValueError:
+			pass
+
+		raise ValueError("Cannot parse %s as offset/size literal" % size)
