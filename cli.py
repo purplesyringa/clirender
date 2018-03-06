@@ -4,18 +4,17 @@ from layout.stackpanel import StackPanel
 
 layout = Layout(
 	StackPanel(
-		width=20, height=20,
-		bg="red",
+		width="100%", height="100%",
 		vertical=False,
 
 		children=[
 			Rect(
-				width=5, height=3,
-				bg="yellow"
+				width="20%", height="100%",
+				bg="#232A31 | white"
 			),
 			Rect(
-				width=3, height=5,
-				bg="green"
+				width="80%", height="100%",
+				bg="black"
 			)
 		]
 	)
