@@ -49,3 +49,8 @@ class Screen(object):
 
 		text += Style.RESET_ALL
 		return text
+
+	def fill(self, x1, y1, x2, y2, char=" ", style=lambda s: s):
+		s = char * (x2 - x1)
+		for y in range(y1, y2):
+			self.printAt(style(s), x=x1, y=y)
