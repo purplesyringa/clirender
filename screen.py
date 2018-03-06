@@ -11,8 +11,6 @@ class Screen(object):
 
 	def __init__(self):
 		if platform.system().lower() == "windows":
-			# On Linux and Darwin, ANSI escapes just work.
-
 			build = int(platform.win32_ver()[1].split(".")[-1])
 			if build < 10525:
 				# Before build 10525, ANSI escapes were not handled by Windows
@@ -25,6 +23,7 @@ class Screen(object):
 				self.color_support = "full"
 			elif build >= 16257:
 				# As of build 16257, we need to enable ANSI escapes manually
+				self.color_support = "full"
 
 				from ctypes import windll, c_int, byref
 				stdout_handle = windll.kernel32.GetStdHandle(c_int(-11))
@@ -32,6 +31,9 @@ class Screen(object):
 				windll.kernel32.GetConsoleMode(c_int(stdout_handle), byref(mode))
 				mode = c_int(mode.value | 4)
 				windll.kernel32.SetConsoleMode(c_int(stdout_handle), mode)
+		else:
+			# On Linux and Darwin, ANSI escapes just work.
+			self.color_support = "full"
 
 		self.terminal_size = self.getTerminalSize()
 
@@ -61,11 +63,36 @@ class Screen(object):
 		self.moveCursor(int(x), int(y))
 		self.write(text)
 
+	def decodeColor(self, color, foreground):
+		if color.lower() in ["black", "blue", "cyan", "green", "magenta", "red", "white", "yellow"]:
+			# Colorama supports these names of colors
+			return getattr(Fore if foreground else Back, color.upper())
+		elif color.startswith("#"):
+			# Hex color
+			color = color[1:]
+
+			if len(color) == 3:
+				# #ABC = #AABBCC
+				color = color[0] * 2 + color[1] * 2 + color[2]
+
+			if len(color) != 6:
+				raise ValueError("Invalid %s color #%s" % ("foreground" if foreground else "background", color))
+
+			if self.color_support != "full":
+				raise ValueError("24-bit colors don't work on this platform")
+
+			r, g, b = color[:2], color[2:4], color[4:]
+			r, g, b = int(r, 16), int(g, 16), int(b, 16)
+
+			return "\x1B[%s;2;%s;%s;%sm" % (38 if foreground else 48, r, g, b)
+		else:
+			raise ValueError("Unknown %s color %s" % ("foreground" if foreground else "background", color))
+
 	def colorize(self, text, fg=None, bg=None, bright=False):
 		if fg is not None:
-			text = getattr(Fore, fg.upper()) + text
+			text = self.decodeColor(fg, True) + text
 		if bg is not None:
-			text = getattr(Back, bg.upper()) + text
+			text = self.decodeColor(bg, False) + text
 		if bright:
 			text = Style.BRIGHT + text
 
