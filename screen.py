@@ -32,7 +32,7 @@ class Screen(object):
 
 
 	def clear(self):
-		self.write("\x1b[3J")
+		self.write("\033[2J\033[1;1f")
 
 	def moveCursor(self, x, y):
 		self.write("\x1b[%d;%dH" % (y, x))
