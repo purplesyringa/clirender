@@ -36,7 +36,7 @@ class Screen(object):
 		self.write("\x1b[%d;%dH" % (y + 1, x + 1))
 
 	def printAt(self, text, x, y):
-		self.moveCursor(x, y)
+		self.moveCursor(int(x), int(y))
 		self.write(text)
 
 	def colorize(self, text, fg=None, bg=None, bright=False):
@@ -51,6 +51,6 @@ class Screen(object):
 		return text
 
 	def fill(self, x1, y1, x2, y2, char=" ", style=lambda s: s):
-		s = char * (x2 - x1)
-		for y in range(y1, y2):
-			self.printAt(style(s), x=x1, y=y)
+		s = char * (int(x2) - int(x1))
+		for y in range(int(y1), int(y2)):
+			self.printAt(style(s), x=int(x1), y=y)
