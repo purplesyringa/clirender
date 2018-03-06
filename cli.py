@@ -1,9 +1,13 @@
 from screen import Screen
 
+
+def init(screen):
+	screen.clear()
+
 def loop(screen):
 	try:
-		print screen.terminal_size
+		screen.printAt("Hello", 2, 2)
 	except IOError:
 		pass
 
-Screen(loop)
+Screen(loop, init=init)
