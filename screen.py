@@ -64,6 +64,13 @@ class Screen(object):
 		self.write(text)
 
 	def decodeColor(self, color, foreground):
+		if "|" in color:
+			color, fallback = color.split("|", 1)
+		else:
+			fallback = None
+
+		color = color.strip()
+
 		if color.lower() in ["black", "blue", "cyan", "green", "magenta", "red", "white", "yellow"]:
 			# Colorama supports these names of colors
 			return getattr(Fore if foreground else Back, color.upper())
@@ -79,6 +86,8 @@ class Screen(object):
 				raise ValueError("Invalid %s color #%s" % ("foreground" if foreground else "background", color))
 
 			if self.color_support != "full":
+				if fallback is not None:
+					return self.decodeColor(fallback, foreground)
 				raise ValueError("24-bit colors don't work on this platform")
 
 			r, g, b = color[:2], color[2:4], color[4:]
