@@ -1,7 +1,7 @@
 from node import Node
 
 class Rect(Node):
-	def __init__(self, width=None, height=None, bg=None):
+	def __init__(self, width, height, bg=None):
 		super(Rect, self).__init__()
 
 		self.width = width
