@@ -1,16 +1,38 @@
-import sys
+import sys, platform
 import size
 
 from colorama import Fore, Back, Style
 
 import colorama
-colorama.init()
 
 class Screen(object):
 	class Resized(Exception):
 		pass
 
 	def __init__(self):
+		if platform.system().lower() == "windows":
+			# On Linux and Darwin, ANSI escapes just work.
+
+			build = int(platform.win32_ver()[1].split(".")[-1])
+			if build < 10525:
+				# Before build 10525, ANSI escapes were not handled by Windows
+				self.color_support = "simulation"
+
+				# Colorama will simulate some ANSI escapes with WinAPI calls
+				colorama.init()
+			elif build < 16257:
+				# Before build 16257, ANSI escapes were enabled by default
+				self.color_support = "full"
+			elif build >= 16257:
+				# As of build 16257, we need to enable ANSI escapes manually
+
+				from ctypes import windll, c_int, byref
+				stdout_handle = windll.kernel32.GetStdHandle(c_int(-11))
+				mode = c_int(0)
+				windll.kernel32.GetConsoleMode(c_int(stdout_handle), byref(mode))
+				mode = c_int(mode.value | 4)
+				windll.kernel32.SetConsoleMode(c_int(stdout_handle), mode)
+
 		self.terminal_size = self.getTerminalSize()
 
 	def loop(self, handler):
