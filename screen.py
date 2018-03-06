@@ -1,7 +1,7 @@
 import sys
 import size
 
-from colorama import Fore, Back as Background, Style
+from colorama import Fore, Back, Style
 
 import colorama
 colorama.init()
@@ -40,3 +40,14 @@ class Screen(object):
 	def printAt(self, text, x, y):
 		self.moveCursor(x, y)
 		self.write(text)
+
+	def colorize(self, text, fg=None, bg=None, bright=False):
+		if fg is not None:
+			text = getattr(Fore, fg.upper()) + text
+		if bg is not None:
+			text = getattr(Back, bg.upper()) + text
+		if bright:
+			text = Style.BRIGHT + text
+
+		text += Style.RESET_ALL
+		return text
