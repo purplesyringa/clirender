@@ -33,7 +33,7 @@ class Screen(object):
 		self.write("\033[2J\033[1;1f")
 
 	def moveCursor(self, x, y):
-		self.write("\x1b[%d;%dH" % (y, x))
+		self.write("\x1b[%d;%dH" % (y + 1, x + 1))
 
 	def printAt(self, text, x, y):
 		self.moveCursor(x, y)
