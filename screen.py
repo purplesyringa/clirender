@@ -10,8 +10,11 @@ class Screen(object):
 	class Resized(Exception):
 		pass
 
-	def __init__(self, handler):
+	def __init__(self, handler, init=None):
 		self.terminal_size = (0, 0)
+
+		if init is not None:
+			init(self)
 
 		while True:
 			cur = self.getTerminalSize()
@@ -27,6 +30,9 @@ class Screen(object):
 	def write(self, data):
 		sys.stdout.write(data)
 
+
+	def clear(self):
+		self.write("\x1b[3J")
 
 	def moveCursor(self, x, y):
 		self.write("\x1b[%d;%dH" % (y, x))
