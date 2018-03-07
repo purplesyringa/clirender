@@ -2,6 +2,9 @@ from rect import Rect
 import random
 
 class StackPanel(Rect):
+	container = True
+	text_container = False
+
 	def __init__(self, width=None, height=None, bg=None, vertical=False, children=[]):
 		super(StackPanel, self).__init__(width=width, height=height, bg=bg)
 

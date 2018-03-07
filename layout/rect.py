@@ -1,6 +1,9 @@
 from node import Node
 
 class Rect(Node):
+	container = False
+	text_container = False
+
 	def __init__(self, width, height, bg=None):
 		super(Rect, self).__init__()
 
