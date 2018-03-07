@@ -24,7 +24,7 @@ class Layout(object):
 
 		# If it isn't a string, what can it be?
 		if not isinstance(size, str):
-			raise ValueError
+			raise ValueError("Offset/size is %s, not int or str" % type(size))
 
 		# Maybe this is a str(int) ?
 		try:
