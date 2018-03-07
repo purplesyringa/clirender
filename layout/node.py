@@ -9,5 +9,5 @@ class Node(object):
 
 		self.render_children = []
 
-	def render(self, layout):
+	def render(self, layout, dry_run=False):
 		raise NotImplementedError

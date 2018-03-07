@@ -11,8 +11,8 @@ class StackPanel(Rect):
 		self.vertical = vertical
 		self.children = children
 
-	def render(self, layout):
-		x1, y1, x2, y2 = super(StackPanel, self).render(layout)
+	def render(self, layout, dry_run=False):
+		x1, y1, x2, y2 = super(StackPanel, self).render(layout, dry_run=dry_run)
 
 		cur_x, cur_y = x1, y1
 
@@ -21,7 +21,7 @@ class StackPanel(Rect):
 			child.render_boundary_left_top = (x1, y1)
 			child.render_boundary_right_bottom = (x2, y2)
 
-			child_x1, child_y1, child_x2, child_y2 = child.render(layout)
+			child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=dry_run)
 
 			if self.vertical:
 				cur_y = child_y2
