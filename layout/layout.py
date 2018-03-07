@@ -23,7 +23,7 @@ class Layout(object):
 			return size
 
 		# If it isn't a string, what can it be?
-		if not isinstance(size, str):
+		if not isinstance(size, str) and not isinstance(size, unicode):
 			raise ValueError("Offset/size is %s, not int or str" % type(size))
 
 		# Maybe this is a str(int) ?
