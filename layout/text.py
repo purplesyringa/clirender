@@ -26,12 +26,16 @@ class Text(Node):
 		x2, y2 = self.render_offset[0] + width, self.render_offset[1] + 1
 		x2, y2 = map(min, zip((x2, y2), self.render_boundary_right_bottom))
 
-		if self.color is not None:
+		bg = self.inherit("bg")
+		color = self.inherit("color")
+		bright = self.inherit("bright")
+
+		if color is not None:
 			if not dry_run:
 				if self.fill:
-					layout.screen.fill(x1, y1, x2, y2, char=self.value, style=lambda s: layout.screen.colorize(s, bg=self.bg, fg=self.color, bright=self.bright))
+					layout.screen.fill(x1, y1, x2, y2, char=self.value, style=lambda s: layout.screen.colorize(s, bg=bg, fg=color, bright=bright))
 				else:
-					layout.screen.printAt(layout.screen.colorize(self.value, bg=self.bg, fg=self.color, bright=self.bright), x1, y1)
-					layout.screen.printAt(layout.screen.colorize(" " * int(width - len(self.value)), bg=self.bg), x1 + len(self.value), y1)
+					layout.screen.printAt(layout.screen.colorize(self.value, bg=bg, fg=color, bright=self.bright), x1, y1)
+					layout.screen.printAt(layout.screen.colorize(" " * int(width - len(self.value)), bg=bg), x1 + len(self.value), y1)
 
 		return x1, y1, x2, y2

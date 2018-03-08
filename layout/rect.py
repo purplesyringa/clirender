@@ -25,8 +25,10 @@ class Rect(Node):
 		x2, y2 = self.render_offset[0] + width, self.render_offset[1] + height
 		x2, y2 = map(min, zip((x2, y2), self.render_boundary_right_bottom))
 
-		if self.bg is not None:
+		bg = self.inherit("bg")
+
+		if bg is not None:
 			if not dry_run:
-				layout.screen.fill(x1, y1, x2, y2, char=" ", style=lambda s: layout.screen.colorize(s, bg=self.bg))
+				layout.screen.fill(x1, y1, x2, y2, char=" ", style=lambda s: layout.screen.colorize(s, bg=bg))
 
 		return x1, y1, x2, y2
