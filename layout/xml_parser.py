@@ -30,7 +30,8 @@ def fromNode(node):
 		if ctor.text_container:
 			if text_nodes == node.childNodes:
 				# Only text inside
-				return ctor(value=node.normalize(), **attrs)
+				value = "".join(map(lambda node: node.nodeValue, text_nodes))
+				return ctor(value=value, **attrs)
 			else:
 				raise ValueError("Text container must contain text")
 
