@@ -11,9 +11,14 @@ class Rect(Node):
 		self.height = height
 		self.bg = bg
 
-	def render(self, layout, dry_run=False):
-		width  = layout.calcRelativeSize(self.width,  self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0])
-		height = layout.calcRelativeSize(self.height, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1])
+	def render(self, layout, dry_run=False, width=None, height=None):
+		if width is None:
+			width = self.width
+		if height is None:
+			height = self.height
+
+		width  = layout.calcRelativeSize(width,  self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0])
+		height = layout.calcRelativeSize(height, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1])
 
 		x1, y1 = map(max, zip(self.render_offset, self.render_boundary_left_top))
 
