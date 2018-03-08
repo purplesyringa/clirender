@@ -1,5 +1,4 @@
 from rect import Rect
-import random
 
 class StackPanel(Rect):
 	container = True
