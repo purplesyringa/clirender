@@ -18,9 +18,11 @@ class Layout(object):
 		self.root.render(self)
 
 	def calcRelativeSize(self, size, total):
-		# Maybe just absolute integer?
-		if isinstance(size, numbers.Integral):
-			return size
+		# Maybe just absolute integer or float?
+		try:
+			return float(size)
+		except ValueError:
+			pass
 
 		# If it isn't a string, what can it be?
 		if not isinstance(size, str) and not isinstance(size, unicode):
