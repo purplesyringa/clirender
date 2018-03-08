@@ -80,7 +80,7 @@ class Screen(object):
 
 			if len(color) == 3:
 				# #ABC = #AABBCC
-				color = color[0] * 2 + color[1] * 2 + color[2]
+				color = color[0] * 2 + color[1] * 2 + color[2] * 2
 
 			if len(color) != 6:
 				raise ValueError("Invalid %s color #%s" % ("foreground" if foreground else "background", color))
