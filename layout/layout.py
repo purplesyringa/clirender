@@ -1,6 +1,8 @@
 from __future__ import division
 
 import numbers
+import re
+import numexpr
 from screen import Screen
 
 class Layout(object):
@@ -40,5 +42,14 @@ class Layout(object):
 				return float(size[:-1]) / 100 * total
 		except ValueError:
 			pass
+
+		# Calculations?
+		if size.startswith("="):
+			expression = size[1:]
+
+			# Replace percents
+			expression = re.sub(r"\b([\d\.]+%)(?=\s|$)", lambda x: str(self.calcRelativeSize(x.group(1), total)), expression)
+
+			return numexpr.evaluate(expression, local_dict={}, global_dict={}).item()
 
 		raise ValueError("Cannot parse %s as offset/size literal" % size)
