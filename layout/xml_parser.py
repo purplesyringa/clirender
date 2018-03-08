@@ -17,9 +17,14 @@ def fromXml(code):
 def fromNode(node):
 	if node.nodeType == xml.dom.Node.ELEMENT_NODE:
 		attrs = {}
+		inheritable = {}
 		for i in range(node.attributes.length):
 			attr = node.attributes.item(i)
-			attrs[attr.nodeName] = attr.nodeValue
+
+			if attr.nodeName.startswith("inherit-"):
+				inheritable[attr.nodeName[len("inherit-"):]] = attr.nodeValue
+			else:
+				attrs[attr.nodeName] = attr.nodeValue
 
 		try:
 			ctor = getattr(nodes, node.tagName)
@@ -34,7 +39,10 @@ def fromNode(node):
 			if text_nodes == children:
 				# Only text inside
 				value = "".join(map(lambda node: node.nodeValue, text_nodes))
-				return ctor(value=value, **attrs)
+
+				node = ctor(value=value, **attrs)
+				node.inheritable = inheritable
+				return node
 			else:
 				raise ValueError("Text container must contain text")
 
@@ -48,10 +56,14 @@ def fromNode(node):
 		if len(children) > 0:
 			# There are some nodes inside
 			if ctor.container:
-				return ctor(children=map(fromNode, children), **attrs)
+				node = ctor(children=map(fromNode, children), **attrs)
+				node.inheritable = inheritable
+				return node
 			else:
 				raise ValueError("%s is not a container" % node.tagName)
 
-		return ctor(**attrs)
+		node = ctor(**attrs)
+		node.inheritable = inheritable
+		return node
 	else:
 		raise ValueError("Unknown node type %s" % node.nodeType)
