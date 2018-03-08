@@ -4,10 +4,10 @@ class StackPanel(Rect):
 	container = True
 	text_container = False
 
-	def __init__(self, width=None, height=None, bg=None, vertical=False, children=[]):
+	def __init__(self, width=None, height=None, bg=None, orientation="horizontal", children=[]):
 		super(StackPanel, self).__init__(width=width, height=height, bg=bg)
 
-		self.vertical = vertical
+		self.vertical = orientation.lower() == "vertical"
 		self.children = children
 
 	def render(self, layout, dry_run=False):
