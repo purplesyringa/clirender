@@ -1,4 +1,5 @@
 from rect import Rect
+from switch import Switch
 
 class StackPanel(Rect):
 	container = True
@@ -36,7 +37,26 @@ class StackPanel(Rect):
 		cur_x, cur_y = x1, y1
 		max_width, max_height = 0, 0
 
+		rows_columns = []
+
 		for child in self.children:
+			if isinstance(child, Switch):
+				# <Switch /> can be used to switch direction
+				if self.vertical:
+					cur_x += max_width
+					cur_y = y1
+
+					rows_columns.append(max_width)
+					max_width = 0
+				else:
+					cur_x = x1
+					cur_y += max_height
+
+					rows_columns.append(max_height)
+					max_height = 0
+
+				continue
+
 			child.render_offset = (cur_x, cur_y)
 
 			child.render_boundary_left_top = self.render_boundary_left_top
@@ -60,6 +80,6 @@ class StackPanel(Rect):
 				cur_x = child_x2
 
 		if self.vertical:
-			return max_width, cur_y - y1
+			return sum(rows_columns) + max_width, cur_y - y1
 		else:
-			return cur_x - x1, max_height
+			return cur_x - x1, sum(rows_columns) + max_height

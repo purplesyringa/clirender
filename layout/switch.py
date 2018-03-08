@@ -8,5 +8,4 @@ class Switch(Node):
 		super(Switch, self).__init__()
 
 	def render(self, layout, dry_run=False):
-		x1, y1 = map(max, zip(self.render_offset, self.render_boundary_left_top))
-		return x1, y1, x1, y1
+		raise ValueError("<Switch> must be used inside <StackPanel> only")
