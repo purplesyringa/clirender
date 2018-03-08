@@ -69,6 +69,8 @@ class StackPanel(Rect):
 				child.render_boundary_left_top[1] = y1
 				child.render_boundary_right_bottom[1] = y2
 
+			child.parent = self
+
 			child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=dry_run)
 
 			max_width = max(max_width, child_x2 - child_x1)

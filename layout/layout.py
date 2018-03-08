@@ -16,6 +16,7 @@ class Layout(object):
 		self.root.render_offset = (0, 0)
 		self.root.render_boundary_left_top = [0, 0]
 		self.root.render_boundary_right_bottom = list(self.screen.terminal_size)
+		self.root.parent = None
 
 		self.root.render(self)
 
