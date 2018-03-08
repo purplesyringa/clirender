@@ -4,7 +4,7 @@ class Text(Node):
 	container = False
 	text_container = True
 
-	def __init__(self, value, width=None, bg=None, color=None, bright=False):
+	def __init__(self, value, width=None, bg=None, color=None, bright=False, fill=False):
 		super(Text, self).__init__()
 
 		self.value = value
@@ -12,6 +12,7 @@ class Text(Node):
 		self.bg = bg
 		self.color = color
 		self.bright = bright is not False
+		self.fill = fill is not False
 
 	def render(self, layout, dry_run=False):
 		if self.width is not None:
@@ -27,7 +28,10 @@ class Text(Node):
 
 		if self.color is not None:
 			if not dry_run:
-				layout.screen.printAt(layout.screen.colorize(self.value, bg=self.bg, fg=self.color, bright=self.bright), x1, y1)
-				layout.screen.printAt(layout.screen.colorize(" " * int(width - len(self.value)), bg=self.bg), x1 + len(self.value), y1)
+				if self.fill:
+					layout.screen.fill(x1, y1, x2, y2, char=self.value, style=lambda s: layout.screen.colorize(s, bg=self.bg, fg=self.color, bright=self.bright))
+				else:
+					layout.screen.printAt(layout.screen.colorize(self.value, bg=self.bg, fg=self.color, bright=self.bright), x1, y1)
+					layout.screen.printAt(layout.screen.colorize(" " * int(width - len(self.value)), bg=self.bg), x1 + len(self.value), y1)
 
 		return x1, y1, x2, y2
