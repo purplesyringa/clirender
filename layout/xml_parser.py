@@ -6,12 +6,13 @@ import nodes
 def fromXml(code):
 	parsed = xml.dom.minidom.parseString(code)
 
-	if len(parsed.childNodes) == 0:
+	children = filter(lambda child: child.nodeType != xml.dom.Node.COMMENT_NODE, parsed.childNodes)
+	if len(children) == 0:
 		raise ValueError("Empty document: no root nodes")
-	elif len(parsed.childNodes) > 1:
+	elif len(children) > 1:
 		raise ValueError("Several root nodes present")
 
-	return fromNode(parsed.childNodes[0])
+	return fromNode(children[0])
 
 def fromNode(node):
 	if node.nodeType == xml.dom.Node.ELEMENT_NODE:
@@ -25,10 +26,12 @@ def fromNode(node):
 		except AttributeError:
 			raise ValueError("Unknown node %s" % node.tagName)
 
-		text_nodes = filter(lambda child: child.nodeType == xml.dom.Node.TEXT_NODE, node.childNodes)
+		children = filter(lambda child: child.nodeType != xml.dom.Node.COMMENT_NODE, node.childNodes)
+
+		text_nodes = filter(lambda child: child.nodeType == xml.dom.Node.TEXT_NODE, children)
 
 		if ctor.text_container:
-			if text_nodes == node.childNodes:
+			if text_nodes == children:
 				# Only text inside
 				value = "".join(map(lambda node: node.nodeValue, text_nodes))
 				return ctor(value=value, **attrs)
@@ -40,7 +43,7 @@ def fromNode(node):
 			raise ValueError("%s should not contain text" % node.tagName)
 
 		# Remove empty text nodes
-		children = filter(lambda child: child.nodeType != xml.dom.Node.TEXT_NODE or child.nodeValue.strip() != "", node.childNodes)
+		children = filter(lambda child: child.nodeType != xml.dom.Node.TEXT_NODE or child.nodeValue.strip() != "", children)
 
 		if len(children) > 0:
 			# There are some nodes inside
