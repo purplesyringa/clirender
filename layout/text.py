@@ -28,5 +28,6 @@ class Text(Node):
 		if self.color is not None:
 			if not dry_run:
 				layout.screen.printAt(layout.screen.colorize(self.value, bg=self.bg, fg=self.color, bright=self.bright), x1, y1)
+				layout.screen.printAt(layout.screen.colorize(" " * int(width - len(self.value)), bg=self.bg), x1 + len(self.value), y1)
 
 		return x1, y1, x2, y2
