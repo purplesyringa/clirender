@@ -28,8 +28,16 @@ class StackPanel(Rect):
 
 		for child in self.children:
 			child.render_offset = (cur_x, cur_y)
-			child.render_boundary_left_top = [x1, y1]
-			child.render_boundary_right_bottom = [x2, y2]
+
+			child.render_boundary_left_top = self.render_boundary_left_top
+			child.render_boundary_right_bottom = self.render_boundary_right_bottom
+
+			if self.width is not None:
+				child.render_boundary_left_top[0] = x1
+				child.render_boundary_right_bottom[0] = x2
+			if self.height is not None:
+				child.render_boundary_left_top[1] = y1
+				child.render_boundary_right_bottom[1] = y2
 
 			child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=dry_run)
 
@@ -41,15 +49,23 @@ class StackPanel(Rect):
 		return x1, y1, x2, y2
 
 	def guessContainerSize(self, layout):
-		x1, y1, _, _ = super(StackPanel, self).render(layout, dry_run=True, width=0, height=0)
+		x1, y1, x2, y2 = super(StackPanel, self).render(layout, dry_run=True, width=self.width or 0, height=self.height or 0)
 
 		cur_x, cur_y = x1, y1
 		max_width, max_height = 0, 0
 
 		for child in self.children:
 			child.render_offset = (cur_x, cur_y)
-			child.render_boundary_left_top = [0, 0]
-			child.render_boundary_right_bottom = list(layout.screen.terminal_size)
+
+			child.render_boundary_left_top = self.render_boundary_left_top
+			child.render_boundary_right_bottom = self.render_boundary_right_bottom
+
+			if self.width is not None:
+				child.render_boundary_left_top[0] = x1
+				child.render_boundary_right_bottom[0] = x2
+			if self.height is not None:
+				child.render_boundary_left_top[1] = y1
+				child.render_boundary_right_bottom[1] = y2
 
 			child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=True)
 
