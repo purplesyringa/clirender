@@ -23,34 +23,16 @@ class StackPanel(Rect):
 			width, height = self.width, self.height
 
 		x1, y1, x2, y2 = super(StackPanel, self).render(layout, dry_run=dry_run, width=width, height=height)
-
-		cur_x, cur_y = x1, y1
-
-		for child in self.children:
-			child.render_offset = (cur_x, cur_y)
-
-			child.render_boundary_left_top = self.render_boundary_left_top
-			child.render_boundary_right_bottom = self.render_boundary_right_bottom
-
-			if self.width is not None:
-				child.render_boundary_left_top[0] = x1
-				child.render_boundary_right_bottom[0] = x2
-			if self.height is not None:
-				child.render_boundary_left_top[1] = y1
-				child.render_boundary_right_bottom[1] = y2
-
-			child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=dry_run)
-
-			if self.vertical:
-				cur_y = child_y2
-			else:
-				cur_x = child_x2
+		self.renderChildren(layout, x1, y1, x2, y2, dry_run=dry_run)
 
 		return x1, y1, x2, y2
 
 	def guessContainerSize(self, layout):
 		x1, y1, x2, y2 = super(StackPanel, self).render(layout, dry_run=True, width=self.width or 0, height=self.height or 0)
 
+		return self.renderChildren(layout, x1, y1, x2, y2, dry_run=True)
+
+	def renderChildren(self, layout, x1, y1, x2, y2, dry_run=False):
 		cur_x, cur_y = x1, y1
 		max_width, max_height = 0, 0
 
@@ -67,7 +49,7 @@ class StackPanel(Rect):
 				child.render_boundary_left_top[1] = y1
 				child.render_boundary_right_bottom[1] = y2
 
-			child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=True)
+			child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=dry_run)
 
 			max_width = max(max_width, child_x2 - child_x1)
 			max_height = max(max_height, child_y2 - child_y1)
