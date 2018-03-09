@@ -84,11 +84,11 @@ def fromNode(node, defines, slots):
 	# Parse defines nodes
 	if node.tag in defines:
 		if len(node) == 1:
-			if node.text.strip() != "":
+			if node.text is not None and node.text.strip() != "":
 				raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
 
 			all_attrs[""] = dict(node=node[0], slots=slots)
-		elif node.text.strip() != "":
+		elif node.text is not None and node.text.strip() != "":
 			all_attrs[""] = node.text
 		elif len(node) > 1:
 			raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
