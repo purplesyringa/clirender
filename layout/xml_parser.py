@@ -28,7 +28,7 @@ def fromXml(code):
 		children = list(node)
 		for child in children:
 			if child.tag == "Slot":
-				name = child.attrib["name"]
+				name = child.attrib["define"]
 				slots[name] = child.attrib.get("default", None)
 
 		children = filter(lambda child: child.tag != "Slot" and child.tag != etree.Comment, children)
