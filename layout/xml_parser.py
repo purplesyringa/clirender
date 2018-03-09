@@ -45,6 +45,15 @@ def fromNode(node, defines, slots):
 		return None
 	elif node.tag == etree.Comment:
 		return None
+	elif node.tag == "Slot":
+		name = node.attrib.get("name", "")
+		if name not in slots:
+			raise ValueError("Unknown slot :%s" % name)
+
+		if isinstance(slots[name], str) or isinstance(slots[name], unicode):
+			raise ValueError("Slot :%s cannot be a string, only a node" % name)
+
+		return fromNode(slots[name]["node"], defines, slots[name]["slots"])
 
 	attrs = {}
 	inheritable = {}
@@ -68,6 +77,16 @@ def fromNode(node, defines, slots):
 
 	# Parse defines nodes
 	if node.tag in defines:
+		if len(node) == 1:
+			if node.text.strip() != "":
+				raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
+
+			all_attrs[""] = dict(node=node[0], slots=slots)
+		elif node.text.strip() != "":
+			all_attrs[""] = node.text
+		elif len(node) > 1:
+			raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
+
 		slots = defines[node.tag]["slots"]
 
 		for name, value in slots.items():
@@ -126,6 +145,8 @@ def getInnerText(node, slots):
 				value += slots[name]
 			except KeyError:
 				raise ValueError("Unknown slot :%s" % name)
+			except TypeError:
+				raise ValueError("Slot :%s is a node, so it cannot be used inside text container" % name)
 		else:
 			raise ValueError("Text container must contain text")
 
