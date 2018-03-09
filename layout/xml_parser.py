@@ -96,6 +96,12 @@ def fromNode(node, defines, slots):
 				value += child
 			elif child.tag == etree.Comment:
 				pass
+			elif child.tag == "Slot" and "name" in child.attrib:
+				name = child.attrib["name"]
+				try:
+					value += slots[name]
+				except KeyError:
+					raise ValueError("Unknown slot :%s" % name)
 			else:
 				raise ValueError("Text container must contain text")
 
