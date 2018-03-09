@@ -94,6 +94,8 @@ def fromNode(node, defines, slots):
 		for child in node.xpath("child::node()"):
 			if isinstance(child, str) or isinstance(child, unicode):
 				value += child
+			elif child.tag == etree.Comment:
+				pass
 			else:
 				raise ValueError("Text container must contain text")
 
