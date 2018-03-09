@@ -90,14 +90,17 @@ def fromNode(node, defines, slots):
 	children = filter(lambda child: child.tag != etree.Comment, node)
 
 	if ctor.text_container:
-		if len(children) == 0:
-			# Only text inside
-			node = ctor(value=node.text or "", **attrs)
-			node.inheritable = inheritable
-			return node
-		else:
-			raise ValueError("Text container must contain text")
+		value = ""
+		for child in node.xpath("child::node()"):
+			if isinstance(child, str) or isinstance(child, unicode):
+				value += child
+			else:
+				raise ValueError("Text container must contain text")
 
+		# Only text inside
+		node = ctor(value=value, **attrs)
+		node.inheritable = inheritable
+		return node
 	if node.text is not None and node.text.strip() != "":
 		raise ValueError("%s should not contain text" % node.tag)
 
