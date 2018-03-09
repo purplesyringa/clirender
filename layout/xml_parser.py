@@ -64,7 +64,7 @@ def fromNode(node, defines, slots):
 			try:
 				value = slots[value]
 			except KeyError:
-				raise ValueError("Unknown slot %s" % value)
+				raise ValueError("Unknown slot :%s" % value)
 
 			name = name[1:]
 
@@ -96,7 +96,7 @@ def fromNode(node, defines, slots):
 
 		for name, value in all_attrs.items():
 			if name not in slots:
-				raise ValueError("Unknown attribute %s passed to <Define name='%s'> as slot" % (name, node.tag))
+				raise ValueError("Unknown slot :%s passed to <Define name='%s'> as slot" % (name, node.tag))
 			slots[name] = value
 
 		return fromNode(defines[node.tag]["node"], defines, slots)
