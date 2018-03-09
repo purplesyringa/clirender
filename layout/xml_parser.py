@@ -38,13 +38,19 @@ def fromXml(code):
 
 		defines[node.attrib["name"]] = dict(node=children[0], slots=slots)
 
-	return fromNode(root, defines, {})
+	result = fromNode(root, defines, {})
+	if len(result) == 0:
+		raise ValueError("No root node")
+	elif len(result) > 1:
+		raise ValueError("Several root nodes")
+
+	return result[0]
 
 def fromNode(node, defines, slots):
 	if node.tag == "Define":
-		return None
+		return []
 	elif node.tag == etree.Comment:
-		return None
+		return []
 	elif node.tag == "Slot":
 		name = node.attrib.get("name", "")
 		if name not in slots:
@@ -114,22 +120,22 @@ def fromNode(node, defines, slots):
 		# Only text inside
 		node = ctor(value=value, **attrs)
 		node.inheritable = inheritable
-		return node
+		return [node]
 	if node.text is not None and node.text.strip() != "":
 		raise ValueError("%s should not contain text" % node.tag)
 
 	if len(children) > 0:
 		# There are some nodes inside
 		if ctor.container:
-			node = ctor(children=filter(lambda node: node is not None, map(lambda child: fromNode(child, defines, slots), node)), **attrs)
+			node = ctor(children=filter(lambda node: node is not None, concat(map(lambda child: fromNode(child, defines, slots), node))), **attrs)
 			node.inheritable = inheritable
-			return node
+			return [node]
 		else:
 			raise ValueError("%s is not a container" % node.tag)
 
 	node = ctor(**attrs)
 	node.inheritable = inheritable
-	return node
+	return [node]
 
 def getInnerText(node, slots):
 	value = ""
@@ -151,3 +157,9 @@ def getInnerText(node, slots):
 			raise ValueError("Text container must contain text")
 
 	return value
+
+def concat(arrs):
+	res = []
+	for arr in arrs:
+		res += arr
+	return res
