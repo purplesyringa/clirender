@@ -90,20 +90,7 @@ def fromNode(node, defines, slots):
 	children = filter(lambda child: child.tag != etree.Comment, node)
 
 	if ctor.text_container:
-		value = ""
-		for child in node.xpath("child::node()"):
-			if isinstance(child, str) or isinstance(child, unicode):
-				value += child
-			elif child.tag == etree.Comment:
-				pass
-			elif child.tag == "Slot" and "name" in child.attrib:
-				name = child.attrib["name"]
-				try:
-					value += slots[name]
-				except KeyError:
-					raise ValueError("Unknown slot :%s" % name)
-			else:
-				raise ValueError("Text container must contain text")
+		value = getInnerText(node, slots)
 
 		# Only text inside
 		node = ctor(value=value, **attrs)
@@ -124,3 +111,22 @@ def fromNode(node, defines, slots):
 	node = ctor(**attrs)
 	node.inheritable = inheritable
 	return node
+
+def getInnerText(node, slots):
+	value = ""
+
+	for child in node.xpath("child::node()"):
+		if isinstance(child, str) or isinstance(child, unicode):
+			value += child
+		elif child.tag == etree.Comment:
+			pass
+		elif child.tag == "Slot":
+			name = child.attrib.get("name", "")
+			try:
+				value += slots[name]
+			except KeyError:
+				raise ValueError("Unknown slot :%s" % name)
+		else:
+			raise ValueError("Text container must contain text")
+
+	return value
