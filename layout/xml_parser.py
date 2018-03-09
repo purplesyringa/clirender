@@ -27,7 +27,7 @@ def fromXml(code):
 
 		children = list(node)
 		for child in children:
-			if child.tag == "Slot":
+			if child.tag == "Slot" and "define" in child.attrib:
 				name = child.attrib["define"]
 				slots[name] = child.attrib.get("default", None)
 
