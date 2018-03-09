@@ -4,9 +4,38 @@ from xml.etree import ElementTree
 import nodes
 
 def fromXml(code):
-	return fromNode(ElementTree.fromstring(code))
+	root = ElementTree.fromstring(code)
 
-def fromNode(node):
+	define_nodes = root.findall("Define")
+
+	for node in define_nodes:
+		if "name" not in node.attrib:
+			raise ValueError("<Define> without 'name' attribute")
+		elif len(node) != 1:
+			raise ValueError("<Define> must have exactly one child")
+		elif getattr(nodes, node.tag, None) is not None:
+			raise ValueError("Cannot <Define> core node %s" % node.tag)
+
+	define_nodes.sort(key=lambda define: define.attrib["name"])
+	for i in range(len(define_nodes) - 1):
+		a = define_nodes[i + 0].attrib["name"]
+		b = define_nodes[i + 1].attrib["name"]
+		if a == b:
+			raise ValueError("Non-unique <Define name='%s'>" % a)
+
+	defines = {}
+	for node in define_nodes:
+		defines[node.attrib["name"]] = node[0]
+
+	return fromNode(root, defines)
+
+def fromNode(node, defines):
+	if node.tag == "Define":
+		return None
+
+	if node.tag in defines:
+		return fromNode(defines[node.tag], defines)
+
 	attrs = {}
 	inheritable = {}
 
@@ -36,7 +65,7 @@ def fromNode(node):
 	if len(node) > 0:
 		# There are some nodes inside
 		if ctor.container:
-			node = ctor(children=map(fromNode, node), **attrs)
+			node = ctor(children=filter(lambda node: node is not None, map(lambda child: fromNode(child, defines), node)), **attrs)
 			node.inheritable = inheritable
 			return node
 		else:
