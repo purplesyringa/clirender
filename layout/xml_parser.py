@@ -3,7 +3,7 @@ from lxml import etree
 import nodes
 
 def fromXml(code):
-	parser = etree.XMLParser()
+	parser = etree.XMLParser(recover=True)
 	root = etree.fromstring(code, parser=parser)
 
 	define_nodes = root.findall("Define")
@@ -11,8 +11,6 @@ def fromXml(code):
 	for node in define_nodes:
 		if "name" not in node.attrib:
 			raise ValueError("<Define> without 'name' attribute")
-		elif len(node) != 1:
-			raise ValueError("<Define> must have exactly one child")
 		elif getattr(nodes, node.tag, None) is not None:
 			raise ValueError("Cannot <Define> core node %s" % node.tag)
 
@@ -25,35 +23,74 @@ def fromXml(code):
 
 	defines = {}
 	for node in define_nodes:
-		defines[node.attrib["name"]] = node[0]
+		slots = {}
 
-	return fromNode(root, defines)
+		children = list(node)
+		for child in children:
+			if child.tag == "Slot":
+				name = child.attrib["name"]
+				slots[name] = child.attrib.get("default", None)
 
-def fromNode(node, defines):
+		children = filter(lambda child: child.tag != "Slot" and child.tag != etree.Comment, children)
+
+		if len(children) != 1:
+			raise ValueError("<Define> must have exactly one child")
+
+		defines[node.attrib["name"]] = dict(node=children[0], slots=slots)
+
+	return fromNode(root, defines, {})
+
+def fromNode(node, defines, slots):
 	if node.tag == "Define":
 		return None
 	elif node.tag == etree.Comment:
 		return None
 
-	if node.tag in defines:
-		return fromNode(defines[node.tag], defines)
-
 	attrs = {}
 	inheritable = {}
+	all_attrs = {}
 
 	for name, value in node.attrib.items():
+		if name[0] == ":": # Attribute name starts with colon, use slot
+			try:
+				value = slots[value]
+			except KeyError:
+				raise ValueError("Unknown slot %s" % value)
+
+			name = name[1:]
+
 		if name.startswith("inherit-"):
 			inheritable[name[len("inherit-"):]] = value
 		else:
 			attrs[name] = value
+
+		all_attrs[name] = value
+
+	# Parse defines nodes
+	if node.tag in defines:
+		slots = defines[node.tag]["slots"]
+
+		for name, value in slots.items():
+			# Non-optional slot not passed
+			if value is None and name not in all_attrs:
+				raise ValueError("Slot :%s without default value not filled when passed to <Define name='%s'>" % (name, node.tag))
+
+		for name, value in all_attrs.items():
+			if name not in slots:
+				raise ValueError("Unknown attribute %s passed to <Define name='%s'> as slot" % (name, node.tag))
+			slots[name] = value
+
+		return fromNode(defines[node.tag]["node"], defines, slots)
 
 	try:
 		ctor = getattr(nodes, node.tag)
 	except AttributeError:
 		raise ValueError("Unknown node %s" % node.tag)
 
+	children = filter(lambda child: child.tag != etree.Comment, node)
+
 	if ctor.text_container:
-		if len(node) == 0:
+		if len(children) == 0:
 			# Only text inside
 			node = ctor(value=node.text or "", **attrs)
 			node.inheritable = inheritable
@@ -64,10 +101,10 @@ def fromNode(node, defines):
 	if node.text is not None and node.text.strip() != "":
 		raise ValueError("%s should not contain text" % node.tag)
 
-	if len(node) > 0:
+	if len(children) > 0:
 		# There are some nodes inside
 		if ctor.container:
-			node = ctor(children=filter(lambda node: node is not None, map(lambda child: fromNode(child, defines), node)), **attrs)
+			node = ctor(children=filter(lambda node: node is not None, map(lambda child: fromNode(child, defines, slots), node)), **attrs)
 			node.inheritable = inheritable
 			return node
 		else:
