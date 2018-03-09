@@ -1,11 +1,10 @@
-import xml.dom
-from xml.etree import ElementTree
+from lxml import etree
 
 import nodes
 
 def fromXml(code):
-	parser = ElementTree.XMLParser()
-	eoor = ElementTree.fromstring(code, parser=parser)
+	parser = etree.XMLParser()
+	root = etree.fromstring(code, parser=parser)
 
 	define_nodes = root.findall("Define")
 
@@ -32,6 +31,8 @@ def fromXml(code):
 
 def fromNode(node, defines):
 	if node.tag == "Define":
+		return None
+	elif node.tag == etree.Comment:
 		return None
 
 	if node.tag in defines:
