@@ -1,69 +1,47 @@
 import xml.dom
-import xml.dom.minidom
+from xml.etree import ElementTree
 
 import nodes
 
 def fromXml(code):
-	parsed = xml.dom.minidom.parseString(code)
-
-	children = filter(lambda child: child.nodeType != xml.dom.Node.COMMENT_NODE, parsed.childNodes)
-	if len(children) == 0:
-		raise ValueError("Empty document: no root nodes")
-	elif len(children) > 1:
-		raise ValueError("Several root nodes present")
-
-	return fromNode(children[0])
+	return fromNode(ElementTree.fromstring(code))
 
 def fromNode(node):
-	if node.nodeType == xml.dom.Node.ELEMENT_NODE:
-		attrs = {}
-		inheritable = {}
-		for i in range(node.attributes.length):
-			attr = node.attributes.item(i)
+	attrs = {}
+	inheritable = {}
 
-			if attr.nodeName.startswith("inherit-"):
-				inheritable[attr.nodeName[len("inherit-"):]] = attr.nodeValue
-			else:
-				attrs[attr.nodeName] = attr.nodeValue
+	for name, value in node.attrib.items():
+		if name.startswith("inherit-"):
+			inheritable[name[len("inherit-"):]] = value
+		else:
+			attrs[name] = value
 
-		try:
-			ctor = getattr(nodes, node.tagName)
-		except AttributeError:
-			raise ValueError("Unknown node %s" % node.tagName)
+	try:
+		ctor = getattr(nodes, node.tag)
+	except AttributeError:
+		raise ValueError("Unknown node %s" % node.tag)
 
-		children = filter(lambda child: child.nodeType != xml.dom.Node.COMMENT_NODE, node.childNodes)
+	if ctor.text_container:
+		if len(node) == 0:
+			# Only text inside
+			node = ctor(value=node.text or "", **attrs)
+			node.inheritable = inheritable
+			return node
+		else:
+			raise ValueError("Text container must contain text")
 
-		text_nodes = filter(lambda child: child.nodeType == xml.dom.Node.TEXT_NODE, children)
+	if node.text is not None and node.text.strip() != "":
+		raise ValueError("%s should not contain text" % node.tag)
 
-		if ctor.text_container:
-			if text_nodes == children:
-				# Only text inside
-				value = "".join(map(lambda node: node.nodeValue, text_nodes))
+	if len(node) > 0:
+		# There are some nodes inside
+		if ctor.container:
+			node = ctor(children=map(fromNode, node), **attrs)
+			node.inheritable = inheritable
+			return node
+		else:
+			raise ValueError("%s is not a container" % node.tag)
 
-				node = ctor(value=value, **attrs)
-				node.inheritable = inheritable
-				return node
-			else:
-				raise ValueError("Text container must contain text")
-
-		text_nodes = filter(lambda child: child.nodeValue.strip() != "", text_nodes)
-		if len(text_nodes) > 0:
-			raise ValueError("%s should not contain text" % node.tagName)
-
-		# Remove empty text nodes
-		children = filter(lambda child: child.nodeType != xml.dom.Node.TEXT_NODE or child.nodeValue.strip() != "", children)
-
-		if len(children) > 0:
-			# There are some nodes inside
-			if ctor.container:
-				node = ctor(children=map(fromNode, children), **attrs)
-				node.inheritable = inheritable
-				return node
-			else:
-				raise ValueError("%s is not a container" % node.tagName)
-
-		node = ctor(**attrs)
-		node.inheritable = inheritable
-		return node
-	else:
-		raise ValueError("Unknown node type %s" % node.nodeType)
+	node = ctor(**attrs)
+	node.inheritable = inheritable
+	return node
