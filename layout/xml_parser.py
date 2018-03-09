@@ -4,7 +4,8 @@ from xml.etree import ElementTree
 import nodes
 
 def fromXml(code):
-	root = ElementTree.fromstring(code)
+	parser = ElementTree.XMLParser()
+	eoor = ElementTree.fromstring(code, parser=parser)
 
 	define_nodes = root.findall("Define")
 
