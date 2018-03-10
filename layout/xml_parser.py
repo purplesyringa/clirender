@@ -60,6 +60,37 @@ def fromNode(node, defines, slots):
 			raise ValueError("Slot :%s cannot be a string, only a node" % name)
 
 		return fromNode(slots[name]["node"], defines, slots[name]["slots"])
+	elif node.tag == "Range":
+		slot = node.attrib.get("slot", None)
+
+		try:
+			from_ = int(node.attrib["from"])
+		except ValueError:
+			raise ValueError("'from' attribute of <Range> must be an integer")
+		except KeyError:
+			raise ValueError("<Range> must contain 'from' attribute")
+
+		try:
+			to = int(node.attrib["to"])
+		except ValueError:
+			raise ValueError("'to' attribute of <Range> must be an integer")
+		except KeyError:
+			raise ValueError("<Range> must contain 'to' attribute")
+
+		try:
+			step = int(node.attrib["step"])
+		except ValueError:
+			raise ValueError("'step' attribute of <Range> must be an integer")
+		except KeyError:
+			step = 1
+
+		res = []
+		new_slots = dict(**slots)
+		for i in range(from_, to, step):
+			new_slots[slot] = str(i)
+			for child in node:
+				res += fromNode(child, defines, new_slots)
+		return res
 
 	attrs = {}
 	inheritable = {}
@@ -84,7 +115,9 @@ def fromNode(node, defines, slots):
 	# Parse defines nodes
 	if node.tag in defines:
 		if len(node) == 1:
-			if node.text is not None and node.text.strip() != "":
+			if node[0].tag == "Range":
+				raise ValueError("Cannot guarantee that <Range> will result in 0 or 1 node, which are allowed as <Slot /> inside <Define>")
+			elif node.text is not None and node.text.strip() != "":
 				raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
 
 			all_attrs[""] = dict(node=node[0], slots=slots)
@@ -138,6 +171,19 @@ def fromNode(node, defines, slots):
 	return [node]
 
 def getInnerText(node, slots):
+	if node.tag == "Slot":
+		name = node.attrib.get("name", "")
+
+		if name not in slots:
+			raise ValueError("Unknown slot :%s" % name)
+		elif isinstance(slots[name], str) or isinstance(slots[name], unicode):
+			return slots[name]
+		elif slots[name]["node"].tag == "Slot":
+			# Recursive slot
+			return getInnerText(slots[name]["node"], slots[name]["slots"])
+		else:
+			raise ValueError("Slot :%s is a node, so it cannot be used inside text container" % name)
+
 	value = ""
 
 	for child in node.xpath("child::node()"):
@@ -146,13 +192,7 @@ def getInnerText(node, slots):
 		elif child.tag == etree.Comment:
 			pass
 		elif child.tag == "Slot":
-			name = child.attrib.get("name", "")
-			try:
-				value += slots[name]
-			except KeyError:
-				raise ValueError("Unknown slot :%s" % name)
-			except TypeError:
-				raise ValueError("Slot :%s is a node, so it cannot be used inside text container" % name)
+			value += getInnerText(child, slots)
 		else:
 			raise ValueError("Text container must contain text")
 
