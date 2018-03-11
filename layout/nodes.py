@@ -3,3 +3,4 @@ from stackpanel import *
 from text import *
 from switch import *
 from container import *
+from alignright import *
