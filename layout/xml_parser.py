@@ -2,6 +2,13 @@ from lxml import etree
 
 import nodes
 
+special_slots = {
+	"__unset__": None
+}
+
+class NoDefault(object):
+	pass
+
 def fromXml(code):
 	parser = etree.XMLParser(recover=True)
 	root = etree.fromstring(code, parser=parser)
@@ -29,7 +36,14 @@ def fromXml(code):
 		for child in children:
 			if child.tag == "Slot" and "define" in child.attrib:
 				name = child.attrib["define"]
-				slots[name] = child.attrib.get("default", None)
+				if name in special_slots:
+					raise ValueError("Defining special slot :%s" % name)
+
+				slots[name] = child.attrib.get("default", NoDefault)
+				if slots[name] is NoDefault:
+					if ":default" in child.attrib:
+						slot_name = child.attrib[":default"]
+						slots[name] = slots.get(slot_name, special_slots.get(slot_name, NoDefault))
 
 		children = filter(lambda child: child.tag != "Slot" and child.tag != etree.Comment, children)
 
@@ -53,13 +67,15 @@ def fromNode(node, defines, slots):
 		return []
 	elif node.tag == "Slot":
 		name = node.attrib.get("name", "")
-		if name not in slots:
+		if name not in slots and name not in special_slots:
 			raise ValueError("Unknown slot :%s" % name)
 
-		if isinstance(slots[name], str) or isinstance(slots[name], unicode):
+		slot = slots.get(name, special_slots.get(name))
+
+		if isinstance(slot, str) or isinstance(slot, unicode):
 			raise ValueError("Slot :%s cannot be a string, only a node" % name)
 
-		return fromNode(slots[name]["node"], defines, slots[name]["slots"])
+		return fromNode(slot["node"], defines, slot["slots"])
 	elif node.tag == "Range":
 		slot = node.attrib.get("slot", None)
 
@@ -101,7 +117,10 @@ def fromNode(node, defines, slots):
 			try:
 				value = slots[value]
 			except KeyError:
-				raise ValueError("Unknown slot :%s" % value)
+				try:
+					value = special_slots[value]
+				except KeyError:
+					raise ValueError("Unknown slot :%s" % value)
 
 			name = name[1:]
 
@@ -130,7 +149,7 @@ def fromNode(node, defines, slots):
 
 		for name, value in slots.items():
 			# Non-optional slot not passed
-			if value is None and name not in all_attrs:
+			if value is NoDefault and name not in all_attrs:
 				raise ValueError("Slot :%s without default value not filled when passed to <Define name='%s'>" % (name, node.tag))
 
 		for name, value in all_attrs.items():
@@ -174,13 +193,16 @@ def getInnerText(node, slots):
 	if node.tag == "Slot":
 		name = node.attrib.get("name", "")
 
-		if name not in slots:
+		if name not in slots and name not in special_slots:
 			raise ValueError("Unknown slot :%s" % name)
-		elif isinstance(slots[name], str) or isinstance(slots[name], unicode):
+
+		slot = slots.get(name, special_slots.get(name))
+
+		if isinstance(slot, str) or isinstance(slot, unicode):
 			return slots[name]
-		elif slots[name]["node"].tag == "Slot":
+		elif slot["node"].tag == "Slot":
 			# Recursive slot
-			return getInnerText(slots[name]["node"], slots[name]["slots"])
+			return getInnerText(slot["node"], slot["slots"])
 		else:
 			raise ValueError("Slot :%s is a node, so it cannot be used inside text container" % name)
 
