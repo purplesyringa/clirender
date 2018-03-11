@@ -16,5 +16,6 @@ class Container(Node):
 		self.child.render_offset = self.render_offset
 		self.child.render_boundary_left_top = self.render_boundary_left_top
 		self.child.render_boundary_right_bottom = self.render_boundary_right_bottom
+		self.child.render_stretch = self.render_stretch
 
 		return self.child.render(layout, dry_run=dry_run)

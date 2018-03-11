@@ -4,6 +4,7 @@ import numbers
 import re
 import numexpr
 from screen import Screen
+from exceptions import NoStretchError
 
 class Layout(object):
 	def __init__(self, root):
@@ -17,10 +18,14 @@ class Layout(object):
 		self.root.render_boundary_left_top = [0, 0]
 		self.root.render_boundary_right_bottom = list(self.screen.terminal_size)
 		self.root.parent = None
+		self.root.render_stretch = self.screen.terminal_size[0]
 
 		self.root.render(self)
 
-	def calcRelativeSize(self, size, total):
+	def calcRelativeSize(self, size, total, stretch=None):
+		if stretch is not None:
+			stretch = self.calcRelativeSize(stretch, total)
+
 		# Maybe just absolute integer or float?
 		try:
 			return float(size)
@@ -49,8 +54,18 @@ class Layout(object):
 			expression = size[1:]
 
 			# Replace percents
-			expression = re.sub(r"\b([\d\.]+%)(?=\s|$)", lambda x: str(self.calcRelativeSize(x.group(1), total)), expression)
+			expression = re.sub(r"\b([\d\.]+%)(?=\s|$)", lambda x: str(self.calcRelativeSize(x.group(1), total, stretch=stretch)), expression)
 
-			return numexpr.evaluate(expression, local_dict={}, global_dict={}).item()
+			try:
+				data = {}
+				if stretch is not None:
+					data["stretch"] = stretch
+
+				return numexpr.evaluate(expression, local_dict={}, global_dict=data).item()
+			except KeyError as e:
+				if e.args[0] == "stretch":
+					raise NoStretchError()
+
+				raise
 
 		raise ValueError("Cannot parse %s as offset/size literal" % size)

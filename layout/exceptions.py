@@ -1,0 +1,2 @@
+class NoStretchError(Exception):
+	pass

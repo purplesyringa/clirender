@@ -17,8 +17,8 @@ class Rect(Node):
 		if height is None:
 			height = self.height
 
-		width  = layout.calcRelativeSize(width,  self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0])
-		height = layout.calcRelativeSize(height, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1])
+		width  = layout.calcRelativeSize(width,  self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
+		height = layout.calcRelativeSize(height, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1], self.render_stretch)
 
 		x1, y1 = map(max, zip(self.render_offset, self.render_boundary_left_top))
 

@@ -7,6 +7,7 @@ class Node(object):
 		self.render_boundary_left_top = [None, None]
 		self.render_boundary_right_bottom = [None, None]
 		self.parent = None
+		self.render_stretch = None
 
 		self.inheritable = {}
 
