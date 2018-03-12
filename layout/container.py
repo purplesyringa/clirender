@@ -11,6 +11,7 @@ class Container(Node):
 			raise ValueError("<Container> can contain only one node")
 
 		self.child = children[0]
+		self.type = None
 
 	def render(self, layout, dry_run=False):
 		self.child.render_offset = self.render_offset

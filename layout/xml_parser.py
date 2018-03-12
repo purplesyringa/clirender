@@ -200,11 +200,17 @@ def handleRange(node, defines, slots, attrs):
 	for i in range(from_, to, step):
 		if slot is not None:
 			new_slots[slot] = str(i)
+
+		children = []
 		for child in node:
-			subchildren = fromNode(child, defines, new_slots)
-			for subchild in subchildren:
-				container = nodes.Container(children=[subchild])
-				res.append(container)
+			children += fromNode(child, defines, new_slots)
+
+		for pos, child in enumerate(children):
+			container = nodes.Container(children=[child])
+			container.type = "range"
+			container.range_value = i
+			container.range_begin = pos == 0
+			res.append(container)
 	return res
 
 def handleDefine(node, defines, slots, all_attrs):
