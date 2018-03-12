@@ -77,7 +77,7 @@ def formatColor(color):
 	values = []
 	for part in parts:
 		try:
-			values.append(screen.colorize(text=part, fg=part))
+			values.append(screen.colorize(text=" ", bg=part) + screen.colorize(text=" " + part, fg=part))
 		except ValueError:
 			pass
 	return " | ".join(values)
