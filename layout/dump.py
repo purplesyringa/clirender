@@ -8,6 +8,9 @@ def dump(node, indent=""):
 	if name == "Container" and node.type == "range":
 		dumpRange(node, indent)
 		return
+	elif name == "Container" and node.type == "define":
+		dumpDefine(node, indent)
+		return
 
 	children = getChildren(node)
 
@@ -67,6 +70,10 @@ def dumpRange(node, indent=""):
 
 	dump(node.child, indent=indent + " ")
 
+def dumpDefine(node, indent=""):
+	sys.stdout.write(indent + Fore.CYAN + "#(define %s)" % node.define_name + Style.RESET_ALL + "\n")
+
+	dump(node.child, indent=indent + " ")
 
 def getChildren(node):
 	try:

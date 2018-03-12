@@ -238,7 +238,11 @@ def handleDefine(node, defines, slots, all_attrs):
 			raise ValueError("Unknown slot :%s passed to <Define name='%s'> as slot" % (name, node.tag))
 		slots[name] = value
 
-	return fromNode(defines[node.tag]["node"], defines, slots)
+	children = fromNode(defines[node.tag]["node"], defines, slots)
+	container = nodes.Container(children=children)
+	container.type = "define"
+	container.define_name = node.tag
+	return [container]
 
 def concat(arrs):
 	res = []
