@@ -75,7 +75,10 @@ def fromNode(node, defines, slots):
 		if isinstance(slot, str) or isinstance(slot, unicode):
 			raise ValueError("Slot :%s cannot be a string, only a node" % name)
 
-		return fromNode(slot["node"], defines, slot["slots"])
+		children = fromNode(slot["node"], defines, slot["slots"])
+		container = nodes.Container(children=children)
+		container.type = "slot"
+		return [container]
 
 	attrs, inheritable, all_attrs = filterAttrs(node, slots)
 

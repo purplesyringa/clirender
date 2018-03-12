@@ -11,6 +11,9 @@ def dump(node, indent=""):
 	elif name == "Container" and node.type == "define":
 		dumpDefine(node, indent)
 		return
+	elif name == "Container" and node.type == "slot":
+		dumpSlot(node, indent)
+		return
 
 	children = getChildren(node)
 
@@ -72,6 +75,11 @@ def dumpRange(node, indent=""):
 
 def dumpDefine(node, indent=""):
 	sys.stdout.write(indent + Fore.CYAN + "#(define %s)" % node.define_name + Style.RESET_ALL + "\n")
+
+	dump(node.child, indent=indent + " ")
+
+def dumpSlot(node, indent=""):
+	sys.stdout.write(indent + Fore.CYAN + "#(slot)" + Style.RESET_ALL + "\n")
 
 	dump(node.child, indent=indent + " ")
 
