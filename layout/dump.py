@@ -5,15 +5,12 @@ from colorama import Fore, Back, Style
 def dump(node, indent=""):
 	name = type(node).__name__
 
-	if name == "Container" and node.type == "range":
-		dumpRange(node, indent)
-		return
-	elif name == "Container" and node.type == "define":
-		dumpDefine(node, indent)
-		return
-	elif name == "Container" and node.type == "slot":
-		dumpSlot(node, indent)
-		return
+	if name == "Container" and node.type is not None:
+		func = "dump" + node.type[0].upper() + node.type[1:]
+		if func in globals():
+			globals()[func](node, indent)
+			dump(node.child, indent=indent + " ")
+			return
 
 	children = getChildren(node)
 
@@ -71,17 +68,11 @@ def dumpRange(node, indent=""):
 	if node.range_begin:
 		sys.stdout.write(indent + Fore.CYAN + "#(range %s)" % node.range_value + Style.RESET_ALL + "\n")
 
-	dump(node.child, indent=indent + " ")
-
 def dumpDefine(node, indent=""):
 	sys.stdout.write(indent + Fore.CYAN + "#(define %s)" % node.define_name + Style.RESET_ALL + "\n")
 
-	dump(node.child, indent=indent + " ")
-
 def dumpSlot(node, indent=""):
 	sys.stdout.write(indent + Fore.CYAN + "#(slot)" + Style.RESET_ALL + "\n")
-
-	dump(node.child, indent=indent + " ")
 
 def dumpText(slots):
 	for val in slots:
