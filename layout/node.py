@@ -28,6 +28,11 @@ class Node(object):
 				if value is None:
 					value = parent.inheritable.get(attr, None)
 
+				# Bypass <Container>
+				from container import Container
+				if value is None and isinstance(parent, Container):
+					value = "inherit"
+
 				node = parent
 		except AttributeError:
 			return value
