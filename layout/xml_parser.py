@@ -77,59 +77,9 @@ def fromNode(node, defines, slots):
 
 		return fromNode(slot["node"], defines, slot["slots"])
 	elif node.tag == "Range":
-		slot = node.attrib.get("slot", None)
+		return handleRange(node, defines, slots)
 
-		try:
-			from_ = int(node.attrib["from"])
-		except ValueError:
-			raise ValueError("'from' attribute of <Range> must be an integer")
-		except KeyError:
-			raise ValueError("<Range> must contain 'from' attribute")
-
-		try:
-			to = int(node.attrib["to"])
-		except ValueError:
-			raise ValueError("'to' attribute of <Range> must be an integer")
-		except KeyError:
-			raise ValueError("<Range> must contain 'to' attribute")
-
-		try:
-			step = int(node.attrib["step"])
-		except ValueError:
-			raise ValueError("'step' attribute of <Range> must be an integer")
-		except KeyError:
-			step = 1
-
-		res = []
-		new_slots = dict(**slots)
-		for i in range(from_, to, step):
-			new_slots[slot] = str(i)
-			for child in node:
-				res += fromNode(child, defines, new_slots)
-		return res
-
-	attrs = {}
-	inheritable = {}
-	all_attrs = {}
-
-	for name, value in node.attrib.items():
-		if name[0] == ":": # Attribute name starts with colon, use slot
-			try:
-				value = slots[value]
-			except KeyError:
-				try:
-					value = special_slots[value]
-				except KeyError:
-					raise ValueError("Unknown slot :%s" % value)
-
-			name = name[1:]
-
-		if name.startswith("inherit-"):
-			inheritable[name[len("inherit-"):]] = value
-		else:
-			attrs[name] = value
-
-		all_attrs[name] = value
+	attrs, inheritable, all_attrs = filterAttrs(node, slots)
 
 	# Parse defines nodes
 	if node.tag in defines:
@@ -219,6 +169,64 @@ def getInnerText(node, slots):
 			raise ValueError("Text container must contain text")
 
 	return value
+
+def filterAttrs(node, slots):
+	attrs = {}
+	inheritable = {}
+	all_attrs = {}
+
+	for name, value in node.attrib.items():
+		if name[0] == ":": # Attribute name starts with colon, use slot
+			try:
+				value = slots[value]
+			except KeyError:
+				try:
+					value = special_slots[value]
+				except KeyError:
+					raise ValueError("Unknown slot :%s" % value)
+
+			name = name[1:]
+
+		if name.startswith("inherit-"):
+			inheritable[name[len("inherit-"):]] = value
+		else:
+			attrs[name] = value
+
+		all_attrs[name] = value
+
+	return attrs, inheritable, all_attrs
+
+def handleRange(node, defines, slots):
+	slot = node.attrib.get("slot", None)
+
+	try:
+		from_ = int(node.attrib["from"])
+	except ValueError:
+		raise ValueError("'from' attribute of <Range> must be an integer")
+	except KeyError:
+		raise ValueError("<Range> must contain 'from' attribute")
+
+	try:
+		to = int(node.attrib["to"])
+	except ValueError:
+		raise ValueError("'to' attribute of <Range> must be an integer")
+	except KeyError:
+		raise ValueError("<Range> must contain 'to' attribute")
+
+	try:
+		step = int(node.attrib["step"])
+	except ValueError:
+		raise ValueError("'step' attribute of <Range> must be an integer")
+	except KeyError:
+		step = 1
+
+	res = []
+	new_slots = dict(**slots)
+	for i in range(from_, to, step):
+		new_slots[slot] = str(i)
+		for child in node:
+			res += fromNode(child, defines, new_slots)
+	return res
 
 def concat(arrs):
 	res = []
