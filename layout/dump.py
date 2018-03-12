@@ -34,7 +34,7 @@ def dump(node, indent=""):
 
 def dumpAttrs(node):
 	attr_names = node.__dict__.keys()
-	attr_names = filter(lambda name: name not in ["parent", "child", "children", "value", "inheritable"] and not name.startswith("render_"), attr_names)
+	attr_names = filter(lambda name: name not in ["parent", "child", "children", "value", "inheritable", "text_slots"] and not name.startswith("render_"), attr_names)
 
 
 	for attr in attr_names:

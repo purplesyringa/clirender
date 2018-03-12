@@ -95,11 +95,12 @@ def fromNode(node, defines, slots):
 	children = filter(lambda child: child.tag != etree.Comment, node)
 
 	if ctor.text_container:
-		value = getInnerText(node, slots)
+		value, text_slots = getInnerText(node, slots)
 
 		# Only text inside
 		node = ctor(value=value, **attrs)
 		node.inheritable = inheritable
+		node.text_slots = text_slots
 		return [node]
 	if node.text is not None and node.text.strip() != "":
 		raise ValueError("%s should not contain text" % node.tag)
@@ -127,26 +128,32 @@ def getInnerText(node, slots):
 		slot = slots.get(name, special_slots.get(name))
 
 		if isinstance(slot, str) or isinstance(slot, unicode):
-			return slots[name]
+			return slots[name], [dict(name=name, value=slots[name])]
 		elif slot["node"].tag == "Slot":
 			# Recursive slot
-			return getInnerText(slot["node"], slot["slots"])
+			slot_value, slot_value_slots = getInnerText(slot["node"], slot["slots"])
+			return slot_value, [dict(name=name, value=slot_value_slots)]
 		else:
 			raise ValueError("Slot :%s is a node, so it cannot be used inside text container" % name)
 
 	value = ""
+	value_slots = []
 
 	for child in node.xpath("child::node()"):
 		if isinstance(child, str) or isinstance(child, unicode):
 			value += child
+			value_slots += child
 		elif child.tag == etree.Comment:
 			pass
 		elif child.tag == "Slot":
-			value += getInnerText(child, slots)
+			slot_value, slot_value_slots = getInnerText(child, slots)
+
+			value += slot_value
+			value_slots += slot_value_slots
 		else:
 			raise ValueError("Text container must contain text")
 
-	return value
+	return value, value_slots
 
 def filterAttrs(node, slots):
 	attrs = {}
