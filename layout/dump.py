@@ -5,6 +5,10 @@ from colorama import Fore, Back, Style
 def dump(node, indent=""):
 	name = type(node).__name__
 
+	if name == "Container" and node.type == "range":
+		dumpRange(node, indent)
+		return
+
 	children = getChildren(node)
 
 	sys.stdout.write(indent + "<")
@@ -56,6 +60,12 @@ def dumpAttrs(node):
 		else:
 			sys.stdout.write(str(value))
 		sys.stdout.write(Style.RESET_ALL)
+
+def dumpRange(node, indent=""):
+	if node.range_begin:
+		sys.stdout.write(indent + Fore.CYAN + "#(range %s)" % node.range_value + Style.RESET_ALL + "\n")
+
+	dump(node.child, indent=indent + " ")
 
 
 def getChildren(node):
