@@ -26,7 +26,7 @@ def dump(node, indent=""):
 		dump(child, indent=indent + " ")
 
 	if hasattr(node, "value"):
-		sys.stdout.write(Fore.GREEN + node.value + Style.RESET_ALL)
+		dumpText(node.text_slots)
 
 	sys.stdout.write((indent if children != [] else "") + "</")
 	sys.stdout.write(Fore.YELLOW + name + Style.RESET_ALL)
@@ -82,6 +82,22 @@ def dumpSlot(node, indent=""):
 	sys.stdout.write(indent + Fore.CYAN + "#(slot)" + Style.RESET_ALL + "\n")
 
 	dump(node.child, indent=indent + " ")
+
+def dumpText(slots):
+	for val in slots:
+		if isinstance(val, str) or isinstance(val, unicode):
+			sys.stdout.write(Fore.GREEN + val + Style.RESET_ALL)
+		else:
+			sys.stdout.write(Fore.CYAN + "#(slot")
+			if val["name"]:
+				sys.stdout.write(" %s=" % val["name"])
+			else:
+				sys.stdout.write("=")
+			sys.stdout.write(Style.RESET_ALL)
+
+			dumpText(val["value"])
+
+			sys.stdout.write(Fore.CYAN + ")" + Style.RESET_ALL)
 
 def getChildren(node):
 	try:
