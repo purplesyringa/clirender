@@ -1,6 +1,8 @@
 import sys
 
 from colorama import Fore, Back, Style
+from screen import Screen
+screen = Screen()
 
 def dump(node, indent=""):
 	name = type(node).__name__
@@ -43,7 +45,7 @@ def dumpAttrs(node):
 		sys.stdout.write(" " + Fore.BLUE + attr + Style.RESET_ALL)
 		sys.stdout.write("=" + Fore.RED)
 		if isinstance(getattr(node, attr), str) or isinstance(getattr(node, attr), unicode):
-			sys.stdout.write("\"" + getattr(node, attr) + "\"")
+			sys.stdout.write("\"" + formatAttr(attr, getattr(node, attr)) + "\"")
 		else:
 			sys.stdout.write(str(getattr(node, attr)))
 		sys.stdout.write(Style.RESET_ALL)
@@ -59,10 +61,26 @@ def dumpAttrs(node):
 		sys.stdout.write(" " + Back.MAGENTA + "inherit-" + name + Style.RESET_ALL)
 		sys.stdout.write("=" + Fore.RED)
 		if isinstance(value, str) or isinstance(value, unicode):
-			sys.stdout.write("\"" + value + "\"")
+			sys.stdout.write("\"" + formatAttr(name, value) + "\"")
 		else:
 			sys.stdout.write(str(value))
 		sys.stdout.write(Style.RESET_ALL)
+
+def formatAttr(name, value):
+	if name in ["color", "bg"]:
+		return formatColor(value)
+
+	return value
+
+def formatColor(color):
+	parts = map(lambda part: part.strip(), color.split("|"))
+	values = []
+	for part in parts:
+		try:
+			values.append(screen.colorize(text=part, fg=part))
+		except ValueError:
+			pass
+	return " | ".join(values)
 
 def dumpRange(node, indent=""):
 	if node.range_begin:
