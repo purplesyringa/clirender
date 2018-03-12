@@ -42,6 +42,22 @@ def dumpAttrs(node):
 		sys.stdout.write(Style.RESET_ALL)
 
 
+	inheritable = node.inheritable
+	for name, value in inheritable.items():
+		if isinstance(value, bool) or value is None:
+			if value:
+				sys.stdout.write(" " + Back.MAGENTA + "inherit-" + name + Style.RESET_ALL)
+			continue
+
+		sys.stdout.write(" " + Back.MAGENTA + "inherit-" + name + Style.RESET_ALL)
+		sys.stdout.write("=" + Fore.RED)
+		if isinstance(value, str) or isinstance(value, unicode):
+			sys.stdout.write("\"" + value + "\"")
+		else:
+			sys.stdout.write(str(value))
+		sys.stdout.write(Style.RESET_ALL)
+
+
 def getChildren(node):
 	try:
 		return node.children
