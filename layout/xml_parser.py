@@ -76,10 +76,11 @@ def fromNode(node, defines, slots):
 			raise ValueError("Slot :%s cannot be a string, only a node" % name)
 
 		return fromNode(slot["node"], defines, slot["slots"])
-	elif node.tag == "Range":
-		return handleRange(node, defines, slots)
 
 	attrs, inheritable, all_attrs = filterAttrs(node, slots)
+
+	if node.tag == "Range":
+		return handleRange(node, defines, slots, attrs)
 
 	# Parse defines nodes
 	if node.tag in defines:
@@ -196,25 +197,25 @@ def filterAttrs(node, slots):
 
 	return attrs, inheritable, all_attrs
 
-def handleRange(node, defines, slots):
-	slot = node.attrib.get("slot", None)
+def handleRange(node, defines, slots, attrs):
+	slot = attrs.get("slot", None)
 
 	try:
-		from_ = int(node.attrib["from"])
+		from_ = int(attrs["from"])
 	except ValueError:
 		raise ValueError("'from' attribute of <Range> must be an integer")
 	except KeyError:
 		raise ValueError("<Range> must contain 'from' attribute")
 
 	try:
-		to = int(node.attrib["to"])
+		to = int(attrs["to"])
 	except ValueError:
 		raise ValueError("'to' attribute of <Range> must be an integer")
 	except KeyError:
 		raise ValueError("<Range> must contain 'to' attribute")
 
 	try:
-		step = int(node.attrib["step"])
+		step = int(attrs["step"])
 	except ValueError:
 		raise ValueError("'step' attribute of <Range> must be an integer")
 	except KeyError:
@@ -223,7 +224,8 @@ def handleRange(node, defines, slots):
 	res = []
 	new_slots = dict(**slots)
 	for i in range(from_, to, step):
-		new_slots[slot] = str(i)
+		if slot is not None:
+			new_slots[slot] = str(i)
 		for child in node:
 			res += fromNode(child, defines, new_slots)
 	return res
