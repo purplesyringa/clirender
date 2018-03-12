@@ -81,34 +81,8 @@ def fromNode(node, defines, slots):
 
 	if node.tag == "Range":
 		return handleRange(node, defines, slots, attrs)
-
-	# Parse defines nodes
-	if node.tag in defines:
-		if len(node) == 1:
-			if node[0].tag == "Range":
-				raise ValueError("Cannot guarantee that <Range> will result in 0 or 1 node, which are allowed as <Slot /> inside <Define>")
-			elif node.text is not None and node.text.strip() != "":
-				raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
-
-			all_attrs[""] = dict(node=node[0], slots=slots)
-		elif node.text is not None and node.text.strip() != "":
-			all_attrs[""] = node.text
-		elif len(node) > 1:
-			raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
-
-		slots = defines[node.tag]["slots"]
-
-		for name, value in slots.items():
-			# Non-optional slot not passed
-			if value is NoDefault and name not in all_attrs:
-				raise ValueError("Slot :%s without default value not filled when passed to <Define name='%s'>" % (name, node.tag))
-
-		for name, value in all_attrs.items():
-			if name not in slots:
-				raise ValueError("Unknown slot :%s passed to <Define name='%s'> as slot" % (name, node.tag))
-			slots[name] = value
-
-		return fromNode(defines[node.tag]["node"], defines, slots)
+	elif node.tag in defines:
+		return handleDefine(node, defines, slots, all_attrs)
 
 	try:
 		ctor = getattr(nodes, node.tag)
@@ -229,6 +203,33 @@ def handleRange(node, defines, slots, attrs):
 		for child in node:
 			res += fromNode(child, defines, new_slots)
 	return res
+
+def handleDefine(node, defines, slots, all_attrs):
+	if len(node) == 1:
+		if node[0].tag == "Range":
+			raise ValueError("Cannot guarantee that <Range> will result in 0 or 1 node, which are allowed as <Slot /> inside <Define>")
+		elif node.text is not None and node.text.strip() != "":
+			raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
+
+		all_attrs[""] = dict(node=node[0], slots=slots)
+	elif node.text is not None and node.text.strip() != "":
+		all_attrs[""] = node.text
+	elif len(node) > 1:
+		raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
+
+	slots = defines[node.tag]["slots"]
+
+	for name, value in slots.items():
+		# Non-optional slot not passed
+		if value is NoDefault and name not in all_attrs:
+			raise ValueError("Slot :%s without default value not filled when passed to <Define name='%s'>" % (name, node.tag))
+
+	for name, value in all_attrs.items():
+		if name not in slots:
+			raise ValueError("Unknown slot :%s passed to <Define name='%s'> as slot" % (name, node.tag))
+		slots[name] = value
+
+	return fromNode(defines[node.tag]["node"], defines, slots)
 
 def concat(arrs):
 	res = []
