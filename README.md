@@ -213,6 +213,32 @@ Notice that though `bg` is *None* by default, on most terminals this will mean `
 `<Container>` is somewhat a proxy for nodes. `<Container><Node /></Container>` passes all data to `<Node />`, so it is equal to just `<Node />`. `<Container>` does not work with `inherit-...` attributes - they are inherited automatically.
 
 
+### AlignRight
+
+`<AlignRight>` is a one-node container. It aligns the child to the right of itself.
+
+Attributes:
+1. width (required)
+2. height (default: *None*)
+3. bg (default: *None*)
+
+Example:
+```xml
+<AlignRight width="40" bg="red">
+    <StackPanel orientation="horizontal" bg="inherit">
+        <Rect width="0" height="1" /> <!-- top offset -->
+        <Switch />
+
+        <Text bg="inherit" color="yellow">Hello world!</Text>
+        <Rect width="2" height="0" /> <!-- right offset -->
+
+        <Switch />
+        <Rect width="0" height="1" /> <!-- bottom offset -->
+    </StackPanel>
+</AlignRight>
+```
+
+
 ## Defines
 
 When some code is used several times, one may want to use `include` directive or something like that. `clirender` has *defines* for this case.
