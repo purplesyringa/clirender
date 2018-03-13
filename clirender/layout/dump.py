@@ -1,7 +1,7 @@
 import sys
 
 from colorama import Fore, Back, Style
-from screen import Screen
+from clirender.screen import Screen
 screen = Screen()
 
 def dump(node, indent=""):

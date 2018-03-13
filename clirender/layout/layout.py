@@ -3,7 +3,7 @@ from __future__ import division
 import numbers
 import re
 import numexpr
-from screen import Screen
+from clirender.screen import Screen
 from exceptions import NoStretchError
 
 class Layout(object):
