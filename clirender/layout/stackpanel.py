@@ -56,20 +56,21 @@ class StackPanel(Rect):
 					if not row_column_has_stretch_problems:
 						rows_columns_no_stretch.append(cur_y - y1)
 
+					rows_columns.append((max_width, cur_y - y1))
+
 					cur_x += max_width
 					cur_y = y1
-
-					rows_columns.append(max_width)
-					max_width = 0
 				else:
 					if not row_column_has_stretch_problems:
 						rows_columns_no_stretch.append(cur_x - x1)
 
+					rows_columns.append((cur_x - x1, max_height))
+
 					cur_x = x1
 					cur_y += max_height
 
-					rows_columns.append(max_height)
-					max_height = 0
+				max_width = 0
+				max_height = 0
 
 				row_column_has_stretch_problems = False
 				continue
@@ -112,7 +113,8 @@ class StackPanel(Rect):
 
 			return self.renderChildren(layout, x1, y1, x2, y2, dry_run=dry_run, stretch=stretch)
 
+		rows_columns.append((max_width, max_height))
 		if self.vertical:
-			return sum(rows_columns) + max_width, cur_y - y1, stretch
+			return sum(value[0] for value in rows_columns), max(value[1] for value in rows_columns), stretch
 		else:
-			return cur_x - x1, sum(rows_columns) + max_height, stretch
+			return max(value[0] for value in rows_columns), sum(value[1] for value in rows_columns), stretch
