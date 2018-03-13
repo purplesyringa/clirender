@@ -3,6 +3,7 @@ setup(
 	name = "clirender",
 	version = "0.5",
 	description = "CLI rendering engine for Python",
+	install_requires = ["colorama", "numexpr", "lxml"],
 	packages = find_packages(),
 	author = "Ivanq",
 	author_email = "imachug@gmail.com",
