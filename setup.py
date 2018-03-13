@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 setup(
 	name = "clirender",
-	version = "0.3",
+	version = "0.4",
 	description = "CLI rendering engine for Python",
 	packages = find_packages(),
 	author = "Ivanq",
