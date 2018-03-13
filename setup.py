@@ -1,8 +1,9 @@
 from setuptools import setup, find_packages
 setup(
 	name = "clirender",
-	version = "0.5",
+	version = "0.6",
 	description = "CLI rendering engine for Python",
+	long_description = open("README.md").read(),
 	install_requires = ["colorama", "numexpr", "lxml"],
 	packages = find_packages(),
 	author = "Ivanq",
