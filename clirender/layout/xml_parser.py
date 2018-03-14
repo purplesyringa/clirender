@@ -236,7 +236,8 @@ def handleDefine(node, defines, slots, all_attrs):
 	elif len(node) > 1:
 		raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
 
-	slots = defines[node.tag]["slots"]
+
+	slots = dict(**defines[node.tag]["slots"])
 
 	for name, value in slots.items():
 		# Non-optional slot not passed
