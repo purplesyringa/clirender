@@ -113,8 +113,9 @@ class StackPanel(Rect):
 
 			return self.renderChildren(layout, x1, y1, x2, y2, dry_run=dry_run, stretch=stretch)
 
-		rows_columns.append((max_width, max_height))
 		if self.vertical:
+			rows_columns.append((max_width, cur_y - y1))
 			return sum(value[0] for value in rows_columns), max(value[1] for value in rows_columns), stretch
 		else:
+			rows_columns.append((cur_x - x1, max_height))
 			return max(value[0] for value in rows_columns), sum(value[1] for value in rows_columns), stretch
