@@ -187,6 +187,47 @@ Example: *Draw red and green rectangles on the first row and blue and yellow rec
 ```
 
 
+#### Stretch
+
+`stretch` can be used as width or height on `<StackPanel>` children. This can only be used with `<Switch />` nodes.
+
+Example: *Make E the size of A + B + C + D*
+```
+    <StackPanel orientation="horizontal">
+        <A /><B /><C /><D />
+        <Switch />
+        <E width="stretch" />
+    </StackPanel>
+```
+
+`stretch` is the size of the main axis. So, when you need the alternate axis (i.e. make all the items the same width), you can use the following trick:
+```
+    <StackPanel orientation="horizontal">
+        <A width="200" /><Switch />
+        <B width="stretch" /><Switch />
+        <C width="stretch" /><Switch />
+        <D width="stretch" /><Switch />
+        <E width="stretch" />
+    </StackPanel>
+```
+
+Example:
+```xml
+<StackPanel orientation="horizontal">
+    <Rect width="stretch" height="1" bg="blue" />
+    <Switch />
+    <StackPanel orientation="vertical">
+        <Rect width="2" height="stretch" bg="blue" />
+        <Switch />
+        <Rect width="3" height="2"></Rect>
+        <Switch />
+        <Rect width="10" height="stretch" bg="blue" />
+    </StackPanel>
+    <Switch />
+    <Rect width="stretch" height="5" bg="blue" />
+</StackPanel>
+```
+
 ### Text
 
 `<Text>` is a text container.
