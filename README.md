@@ -136,7 +136,7 @@ Attributes:
 `orientation` is the main axis.
 
 Example: *Draw a yellow rectangle next to a red rectangle*
-```
+```xml
 <StackPanel>
     <Rect width="20" height="10" bg="red" />
     <Rect width="25" height="5" bg="yellow" />
@@ -144,7 +144,7 @@ Example: *Draw a yellow rectangle next to a red rectangle*
 ```
 
 Example: *Draw a yellow rectangle unders a red rectangle*
-```
+```xml
 <StackPanel orientation="vertical">
     <Rect width="20" height="10" bg="red" />
     <Rect width="25" height="5" bg="yellow" />
@@ -152,7 +152,7 @@ Example: *Draw a yellow rectangle unders a red rectangle*
 ```
 
 Example: *Draw a yellow rectangle next to a red rectangle, both inside a green rectangle. The height is the sum of the height of the children, i.e. 15*
-```
+```xml
 <StackPanel width="30" bg="green">
     <Rect width="20" height="10" bg="red" />
     <Rect width="25" height="5" bg="yellow" />
@@ -165,7 +165,7 @@ Example: *Draw a yellow rectangle next to a red rectangle, both inside a green r
 `<Switch />` can be used inside `<StackPanel>` only. After several nodes were rendered along the main axis, `<Switch />` will return to the beginning of the main axis and jump down along the alternate axis.
 
 Example: *Draw red and green rectangles on the first row and blue and yellow rectangles in the second row*
-```
+```xml
 <StackPanel orientation="horizontal">
     <Rect width="4" height="2" bg="red" />
     <Rect width="4" height="2" bg="green" />
@@ -176,7 +176,7 @@ Example: *Draw red and green rectangles on the first row and blue and yellow rec
 ```
 
 `<Switch />` will not help you to draw a table if the size of the items is different. For example:
-```
+```xml
 <StackPanel orientation="horizontal">
     <Rect width="4" height="3" bg="red" />
     <Rect width="8" height="2" bg="green" />
@@ -192,7 +192,7 @@ Example: *Draw red and green rectangles on the first row and blue and yellow rec
 `stretch` can be used as width or height on `<StackPanel>` children. This can only be used with `<Switch />` nodes.
 
 Example: *Make E the size of A + B + C + D*
-```
+```xml
     <StackPanel orientation="horizontal">
         <A /><B /><C /><D />
         <Switch />
@@ -201,7 +201,7 @@ Example: *Make E the size of A + B + C + D*
 ```
 
 `stretch` is the size of the main axis. So, when you need the alternate axis (i.e. make all the items the same width), you can use the following trick:
-```
+```xml
     <StackPanel orientation="horizontal">
         <A width="200" /><Switch />
         <B width="stretch" /><Switch />
