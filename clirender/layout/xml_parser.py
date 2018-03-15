@@ -13,6 +13,11 @@ def fromXml(code):
 	parser = etree.XMLParser(recover=True)
 	root = etree.fromstring(code, parser=parser)
 
+	libs = []
+	for node in root.findall("Use"):
+		if "lib" in node.attrib:
+			libs.append(node.attrib["lib"])
+
 	define_nodes = root.findall("Define")
 
 	for node in define_nodes:
@@ -67,9 +72,8 @@ def fromXml(code):
 
 	return handleElement(root, defines, slots={})[0]
 
-
 def handleElement(node, defines, slots):
-	if node.tag == "Define":
+	if node.tag in ["Define", "Use"]:
 		return []
 	elif node.tag is etree.Comment:
 		return []
