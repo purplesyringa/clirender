@@ -132,8 +132,10 @@ Attributes:
 2. `height` (default: *None*)
 3. `bg` (default: *None*)
 4. `orientation` (default: `horizontal`)
+5. `wspacing` (default: `0`)
+6. `hspacing` (default: `0`)
 
-`orientation` is the main axis.
+`orientation` is the main axis. `wspacing` is the horizontal distance between items. `hspacing` is the vertical distance.
 
 Example: *Draw a yellow rectangle next to a red rectangle*
 ```xml
