@@ -6,10 +6,12 @@ class StackPanel(Rect):
 	container = True
 	text_container = False
 
-	def __init__(self, width=None, height=None, bg=None, orientation="horizontal", children=[]):
+	def __init__(self, width=None, height=None, bg=None, orientation="horizontal", hspacing=0, wspacing=0, children=[]):
 		super(StackPanel, self).__init__(width=width, height=height, bg=bg)
 
 		self.vertical = orientation.lower() == "vertical"
+		self.hspacing = hspacing
+		self.wspacing = wspacing
 		self.children = children
 
 	def render(self, layout, dry_run=False):
@@ -58,7 +60,7 @@ class StackPanel(Rect):
 
 					rows_columns.append((max_width, cur_y - y1))
 
-					cur_x += max_width
+					cur_x += max_width + self.wspacing
 					cur_y = y1
 				else:
 					if not row_column_has_stretch_problems:
@@ -67,7 +69,7 @@ class StackPanel(Rect):
 					rows_columns.append((cur_x - x1, max_height))
 
 					cur_x = x1
-					cur_y += max_height
+					cur_y += max_height + self.hspacing
 
 				max_width = 0
 				max_height = 0
@@ -100,9 +102,9 @@ class StackPanel(Rect):
 			max_height = max(max_height, child_y2 - child_y1)
 
 			if self.vertical:
-				cur_y = child_y2
+				cur_y = child_y2 + self.hspacing
 			else:
-				cur_x = child_x2
+				cur_x = child_x2 + self.wspacing
 
 		if len(rows_columns_no_stretch) < len(rows_columns):
 			# Some rows/columns used 'stretch' variable, which was not calculated yet
