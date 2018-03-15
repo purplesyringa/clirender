@@ -43,6 +43,9 @@ class StackPanel(Rect):
 		return self.renderChildren(layout, x1, y1, x2, y2, dry_run=True, stretch=stretch)
 
 	def renderChildren(self, layout, x1, y1, x2, y2, dry_run=False, stretch=None):
+		wspacing = layout.calcRelativeSize(self.wspacing, self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
+		hspacing = layout.calcRelativeSize(self.hspacing, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1], self.render_stretch)
+
 		cur_x, cur_y = x1, y1
 		max_width, max_height = 0, 0
 
@@ -60,7 +63,7 @@ class StackPanel(Rect):
 
 					rows_columns.append((max_width, cur_y - y1))
 
-					cur_x += max_width + self.wspacing
+					cur_x += max_width + wspacing
 					cur_y = y1
 				else:
 					if not row_column_has_stretch_problems:
@@ -69,7 +72,7 @@ class StackPanel(Rect):
 					rows_columns.append((cur_x - x1, max_height))
 
 					cur_x = x1
-					cur_y += max_height + self.hspacing
+					cur_y += max_height + hspacing
 
 				max_width = 0
 				max_height = 0
@@ -102,9 +105,9 @@ class StackPanel(Rect):
 			max_height = max(max_height, child_y2 - child_y1)
 
 			if self.vertical:
-				cur_y = child_y2 + self.hspacing
+				cur_y = child_y2 + hspacing
 			else:
-				cur_x = child_x2 + self.wspacing
+				cur_x = child_x2 + wspacing
 
 		if len(rows_columns_no_stretch) < len(rows_columns):
 			# Some rows/columns used 'stretch' variable, which was not calculated yet
