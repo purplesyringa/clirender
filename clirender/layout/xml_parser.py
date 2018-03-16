@@ -82,10 +82,13 @@ def fromNode(node, defines, slots):
 
 	attrs, inheritable, all_attrs = filterAttrs(node, slots)
 
-	if node.tag == "Range":
-		return handleRange(node, defines, slots, attrs)
-	elif node.tag in defines:
+	if node.tag in defines:
 		return handleDefine(node, defines, slots, all_attrs)
+
+	for name in attrs.keys():
+		if name in ["from"]:
+			attrs[name + "_"] = attrs[name]
+			del attrs[name]
 
 	try:
 		ctor = getattr(nodes, node.tag)
@@ -180,48 +183,6 @@ def filterAttrs(node, slots):
 		all_attrs[name] = value
 
 	return attrs, inheritable, all_attrs
-
-def handleRange(node, defines, slots, attrs):
-	slot = attrs.get("slot", None)
-
-	try:
-		from_ = int(attrs["from"])
-	except ValueError:
-		raise ValueError("'from' attribute of <Range> must be an integer")
-	except KeyError:
-		raise ValueError("<Range> must contain 'from' attribute")
-
-	try:
-		to = int(attrs["to"])
-	except ValueError:
-		raise ValueError("'to' attribute of <Range> must be an integer")
-	except KeyError:
-		raise ValueError("<Range> must contain 'to' attribute")
-
-	try:
-		step = int(attrs["step"])
-	except ValueError:
-		raise ValueError("'step' attribute of <Range> must be an integer")
-	except KeyError:
-		step = 1
-
-	res = []
-	new_slots = dict(**slots)
-	for i in range(from_, to, step):
-		if slot is not None:
-			new_slots[slot] = str(i)
-
-		children = []
-		for child in node:
-			children += fromNode(child, defines, new_slots)
-
-		for pos, child in enumerate(children):
-			container = nodes.Container(children=[child])
-			container.type = "range"
-			container.range_value = i
-			container.range_begin = pos == 0
-			res.append(container)
-	return res
 
 def handleDefine(node, defines, slots, all_attrs):
 	if len(node) == 1:

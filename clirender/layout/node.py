@@ -43,4 +43,13 @@ class Node(object):
 
 
 	def getChildren(self):
-		return self.children
+		from generator import Generator
+
+		res = []
+		for child in self.children:
+			if isinstance(child, Generator):
+				res += child.generate()
+			else:
+				res.append(child)
+
+		return res
