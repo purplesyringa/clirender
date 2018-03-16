@@ -1,6 +1,6 @@
 from rect import Rect
 from switch import Switch
-from exceptions import NoStretchError
+from ..exceptions import NoStretchError
 
 class StackPanel(Rect):
 	container = True
