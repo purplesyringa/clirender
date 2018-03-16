@@ -53,7 +53,7 @@ class StackPanel(Rect):
 		row_column_has_stretch_problems = False
 		rows_columns_no_stretch = []
 
-		for child in self.children:
+		for child in self.getChildren():
 			if isinstance(child, Switch):
 				# <Switch /> can be used to switch direction
 				if self.vertical:

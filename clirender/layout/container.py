@@ -10,10 +10,10 @@ class Container(Node):
 		self.type = None
 
 	def render(self, layout, dry_run=False):
-		if len(self.children) != 1:
+		if len(self.getChildren()) != 1:
 			raise ValueError("<Container> can contain only one node")
 
-		child = self.children[0]
+		child = self.getChildren()[0]
 
 		child.render_offset = self.render_offset
 		child.render_boundary_left_top = self.render_boundary_left_top

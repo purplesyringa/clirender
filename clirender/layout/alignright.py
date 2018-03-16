@@ -8,7 +8,7 @@ class AlignRight(Rect):
 		super(AlignRight, self).__init__(width=width, height=height, bg=bg, children=children)
 
 	def render(self, layout, dry_run=False):
-		if len(self.children) != 1:
+		if len(self.getChildren()) != 1:
 			raise ValueError("<AlignRight> can contain only one node")
 
 		# Get child size
@@ -34,7 +34,7 @@ class AlignRight(Rect):
 		if child_width is not None:
 			x1 = x2 - child_width
 
-		child = self.children[0]
+		child = self.getChildren()[0]
 
 		child.render_offset = (x1, y1)
 

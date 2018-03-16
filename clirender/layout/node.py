@@ -40,3 +40,7 @@ class Node(object):
 			return value
 
 		return value
+
+
+	def getChildren(self):
+		return self.children
