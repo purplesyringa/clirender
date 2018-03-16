@@ -7,12 +7,11 @@ class StackPanel(Rect):
 	text_container = False
 
 	def __init__(self, width=None, height=None, bg=None, orientation="horizontal", hspacing=0, wspacing=0, children=[]):
-		super(StackPanel, self).__init__(width=width, height=height, bg=bg)
+		super(StackPanel, self).__init__(width=width, height=height, bg=bg, children=children)
 
 		self.vertical = orientation.lower() == "vertical"
 		self.hspacing = hspacing
 		self.wspacing = wspacing
-		self.children = children
 
 	def render(self, layout, dry_run=False):
 		# Guess container size

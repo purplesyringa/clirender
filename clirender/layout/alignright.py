@@ -5,14 +5,12 @@ class AlignRight(Rect):
 	text_container = False
 
 	def __init__(self, width, height=None, bg=None, children=[]):
-		super(AlignRight, self).__init__(width=width, height=height, bg=bg)
-
-		if len(children) != 1:
-			raise ValueError("<AlignRight> can contain only one node")
-
-		self.child = children[0]
+		super(AlignRight, self).__init__(width=width, height=height, bg=bg, children=children)
 
 	def render(self, layout, dry_run=False):
+		if len(self.children) != 1:
+			raise ValueError("<AlignRight> can contain only one node")
+
 		# Get child size
 		child_width, child_height = self.guessContainerSize(layout)
 
@@ -36,24 +34,26 @@ class AlignRight(Rect):
 		if child_width is not None:
 			x1 = x2 - child_width
 
-		self.child.render_offset = (x1, y1)
+		child = self.children[0]
+
+		child.render_offset = (x1, y1)
 
 
-		self.child.render_boundary_left_top = self.render_boundary_left_top
-		self.child.render_boundary_right_bottom = self.render_boundary_right_bottom
+		child.render_boundary_left_top = self.render_boundary_left_top
+		child.render_boundary_right_bottom = self.render_boundary_right_bottom
 
 
-		self.child.render_boundary_left_top[0] = x1
-		self.child.render_boundary_right_bottom[0] = x2
+		child.render_boundary_left_top[0] = x1
+		child.render_boundary_right_bottom[0] = x2
 
 		if self.height is not None:
-			self.child.render_boundary_left_top[1] = y1
-			self.child.render_boundary_right_bottom[1] = y2
+			child.render_boundary_left_top[1] = y1
+			child.render_boundary_right_bottom[1] = y2
 
 
-		self.child.parent = self
-		self.child.render_stretch = self.render_stretch
+		child.parent = self
+		child.render_stretch = self.render_stretch
 
-		child_x1, child_y1, child_x2, child_y2 = self.child.render(layout, dry_run=dry_run)
+		child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=dry_run)
 
 		return child_x2 - child_x1, child_y2 - child_y1

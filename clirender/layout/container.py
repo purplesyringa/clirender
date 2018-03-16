@@ -5,19 +5,20 @@ class Container(Node):
 	text_container = False
 
 	def __init__(self, children=[]):
-		super(Container, self).__init__()
+		super(Container, self).__init__(children=children)
 
-		if len(children) != 1:
-			raise ValueError("<Container> can contain only one node")
-
-		self.child = children[0]
 		self.type = None
 
 	def render(self, layout, dry_run=False):
-		self.child.render_offset = self.render_offset
-		self.child.render_boundary_left_top = self.render_boundary_left_top
-		self.child.render_boundary_right_bottom = self.render_boundary_right_bottom
-		self.child.render_stretch = self.render_stretch
-		self.child.parent = self
+		if len(self.children) != 1:
+			raise ValueError("<Container> can contain only one node")
 
-		return self.child.render(layout, dry_run=dry_run)
+		child = self.children[0]
+
+		child.render_offset = self.render_offset
+		child.render_boundary_left_top = self.render_boundary_left_top
+		child.render_boundary_right_bottom = self.render_boundary_right_bottom
+		child.render_stretch = self.render_stretch
+		child.parent = self
+
+		return child.render(layout, dry_run=dry_run)
