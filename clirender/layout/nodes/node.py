@@ -2,7 +2,7 @@ class Node(object):
 	container = False
 	text_container = False
 
-	def __init__(self, children=None, **kwargs):
+	def __init__(self, children=None, value=[], **kwargs):
 		self.render_offset = (None, None)
 		self.render_boundary_left_top = [None, None]
 		self.render_boundary_right_bottom = [None, None]
@@ -13,6 +13,7 @@ class Node(object):
 		self.inheritable = {}
 
 		self.children = children
+		self.value = value
 
 	def render(self, layout, dry_run=False):
 		raise NotImplementedError

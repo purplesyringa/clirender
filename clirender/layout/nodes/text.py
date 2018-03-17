@@ -5,9 +5,8 @@ class Text(Node):
 	text_container = True
 
 	def __init__(self, value, width=None, bg=None, color=None, bright=False, fill=False):
-		super(Text, self).__init__()
+		super(Text, self).__init__(value=value)
 
-		self.value = value
 		self.width = width
 		self.bg = bg
 		self.color = color
