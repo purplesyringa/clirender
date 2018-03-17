@@ -13,12 +13,11 @@ class Container(Node):
 		if len(self.getChildren()) != 1:
 			raise ValueError("<Container> can contain only one node")
 
-		child = self.getChildren()[0]
+		return self.renderChild(
+			layout, self.getChildren()[0], dry_run=dry_run,
 
-		child.render_offset = self.render_offset
-		child.render_boundary_left_top = self.render_boundary_left_top
-		child.render_boundary_right_bottom = self.render_boundary_right_bottom
-		child.render_stretch = self.render_stretch
-		child.parent = self
-
-		return child.render(layout, dry_run=dry_run)
+			offset=self.render_offset,
+			boundary_left_top=self.render_boundary_left_top,
+			boundary_right_bottom=self.render_boundary_right_bottom,
+			stretch=self.render_stretch
+		)

@@ -35,25 +35,21 @@ class AlignRight(Rect):
 			x1 = x2 - child_width
 
 		child = self.getChildren()[0]
+		child_x1, child_y1, child_x2, child_y2 = self.renderChild(
+			layout, child, dry_run=dry_run,
 
-		child.render_offset = (x1, y1)
+			offset=(x1, y1),
 
+			boundary_left_top=(
+				x1,
+				y1 if self.height is not None else self.render_boundary_left_top[1]
+			),
+			boundary_right_bottom=(
+				x2,
+				y2 if self.height is not None else self.render_boundary_right_bottom[1]
+			),
 
-		child.render_boundary_left_top = self.render_boundary_left_top
-		child.render_boundary_right_bottom = self.render_boundary_right_bottom
-
-
-		child.render_boundary_left_top[0] = x1
-		child.render_boundary_right_bottom[0] = x2
-
-		if self.height is not None:
-			child.render_boundary_left_top[1] = y1
-			child.render_boundary_right_bottom[1] = y2
-
-
-		child.parent = self
-		child.render_stretch = self.render_stretch
-
-		child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=dry_run)
+			stretch=self.render_stretch
+		)
 
 		return child_x2 - child_x1, child_y2 - child_y1

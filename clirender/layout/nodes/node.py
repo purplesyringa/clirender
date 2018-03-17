@@ -9,6 +9,7 @@ class Node(object):
 		self.parent = None
 		self.render_stretch = None
 
+		self.slot_context = {}
 		self.inheritable = {}
 
 		self.children = children
@@ -50,6 +51,16 @@ class Node(object):
 			if isinstance(child, Generator):
 				res += child.generate()
 			else:
-				res.append(child)
+				res.append(dict(node=child, slots=self.slot_context))
 
 		return res
+
+
+	def renderChild(self, layout, child, dry_run, offset, boundary_left_top, boundary_right_bottom, stretch):
+		child["node"].render_offset = offset
+		child["node"].render_boundary_left_top = boundary_left_top
+		child["node"].render_boundary_right_bottom = boundary_right_bottom
+		child["node"].render_stretch = stretch
+		child["node"].parent = self
+
+		return child["node"].render(layout, dry_run=dry_run)

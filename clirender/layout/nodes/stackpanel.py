@@ -54,7 +54,7 @@ class StackPanel(Rect):
 		rows_columns_no_stretch = []
 
 		for child in self.getChildren():
-			if isinstance(child, Switch):
+			if isinstance(child["node"], Switch):
 				# <Switch /> can be used to switch direction
 				if self.vertical:
 					if not row_column_has_stretch_problems:
@@ -79,23 +79,24 @@ class StackPanel(Rect):
 				row_column_has_stretch_problems = False
 				continue
 
-			child.render_offset = (cur_x, cur_y)
-
-			child.render_boundary_left_top = self.render_boundary_left_top
-			child.render_boundary_right_bottom = self.render_boundary_right_bottom
-
+			boundary_left_top = self.render_boundary_left_top
+			boundary_right_bottom = self.render_boundary_right_bottom
 			if self.width is not None:
-				child.render_boundary_left_top[0] = x1
-				child.render_boundary_right_bottom[0] = x2
+				boundary_left_top[0] = x1
+				boundary_right_bottom[0] = x2
 			if self.height is not None:
-				child.render_boundary_left_top[1] = y1
-				child.render_boundary_right_bottom[1] = y2
-
-			child.parent = self
-			child.render_stretch = stretch
+				boundary_left_top[1] = y1
+				boundary_right_bottom[1] = y2
 
 			try:
-				child_x1, child_y1, child_x2, child_y2 = child.render(layout, dry_run=dry_run)
+				child_x1, child_y1, child_x2, child_y2 = self.renderChild(
+					layout, child, dry_run=dry_run,
+
+					offset=(cur_x, cur_y),
+					boundary_left_top=boundary_left_top,
+					boundary_right_bottom=boundary_right_bottom,
+					stretch = stretch
+				)
 			except NoStretchError:
 				row_column_has_stretch_problems = True
 				continue
