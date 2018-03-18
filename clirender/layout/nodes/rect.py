@@ -4,8 +4,8 @@ class Rect(Node):
 	container = False
 	text_container = False
 
-	def __init__(self, width, height, bg=None):
-		super(Rect, self).__init__()
+	def __init__(self, width, height, bg=None, children=None):
+		super(Rect, self).__init__(children=children)
 
 		self.width = width
 		self.height = height
@@ -13,9 +13,9 @@ class Rect(Node):
 
 	def render(self, layout, dry_run=False, width=None, height=None):
 		if width is None:
-			width = self.width
+			width = self.get("width")
 		if height is None:
-			height = self.height
+			height = self.get("height")
 
 		width  = layout.calcRelativeSize(width,  self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
 		height = layout.calcRelativeSize(height, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1], self.render_stretch)

@@ -1,6 +1,7 @@
 from lxml import etree
 
 import nodes
+from slot import Slot
 
 special_slots = {
 	"__unset__": None
@@ -45,14 +46,14 @@ def fromXml(code):
 						slot_name = child.attrib[":default"]
 						slots[name] = slots.get(slot_name, special_slots.get(slot_name, NoDefault))
 
-		children = filter(lambda child: child.tag != "Slot" and child.tag != etree.Comment, children)
+		children = filter(lambda child: (child.tag != "Slot" or "define" not in child.attrib) and child.tag != etree.Comment, children)
 
 		if len(children) != 1:
 			raise ValueError("<Define> must have exactly one child")
 
 		defines[node.attrib["name"]] = dict(node=children[0], slots=slots)
 
-	result = fromNode(root, defines, {})
+	result = fromNode(root, defines, parent=None)
 	if len(result) == 0:
 		raise ValueError("No root node")
 	elif len(result) > 1:
@@ -60,32 +61,32 @@ def fromXml(code):
 
 	return result[0]
 
-def fromNode(node, defines, slots):
+def fromNode(node, defines, parent):
 	if node.tag == "Define":
 		return []
 	elif node.tag == etree.Comment:
 		return []
 	elif node.tag == "Slot":
 		name = node.attrib.get("name", "")
-		if name not in slots and name not in special_slots:
-			raise ValueError("Unknown slot :%s" % name)
 
-		slot = slots.get(name, special_slots.get(name))
+		if name in special_slots:
+			slot = special_slots[name]
+			if isinstance(slot, str) or isinstance(slot, unicode):
+				raise ValueError("Slot :%s cannot be a string, only a node" % name)
 
-		if isinstance(slot, str) or isinstance(slot, unicode):
-			raise ValueError("Slot :%s cannot be a string, only a node" % name)
+			return fromNode(slot["node"], defines, parent=parent)
+		else:
+			return [Slot(name, context=parent)]
 
-		children = fromNode(slot["node"], defines, slot["slots"])
-		container = nodes.Container(children=children)
-		container.type = "slot"
-		return [container]
+	attrs, inheritable, all_attrs = filterAttrs(node, context=parent)
 
-	attrs, inheritable, all_attrs = filterAttrs(node, slots)
+	if node.tag in defines:
+		return handleDefine(node, defines, all_attrs, parent=parent)
 
-	if node.tag == "Range":
-		return handleRange(node, defines, slots, attrs)
-	elif node.tag in defines:
-		return handleDefine(node, defines, slots, all_attrs)
+	for name in attrs.keys():
+		if name in ["from"]:
+			attrs[name + "_"] = attrs[name]
+			del attrs[name]
 
 	try:
 		ctor = getattr(nodes, node.tag)
@@ -95,12 +96,11 @@ def fromNode(node, defines, slots):
 	children = filter(lambda child: child.tag != etree.Comment, node)
 
 	if ctor.text_container:
-		value, text_slots = getInnerText(node, slots)
+		value = getInnerText(node, context=parent)
 
 		# Only text inside
 		node = ctor(value=value, **attrs)
 		node.inheritable = inheritable
-		node.text_slots = text_slots
 		return [node]
 	if node.text is not None and node.text.strip() != "":
 		raise ValueError("%s should not contain text" % node.tag)
@@ -108,9 +108,13 @@ def fromNode(node, defines, slots):
 	if len(children) > 0:
 		# There are some nodes inside
 		if ctor.container:
-			node = ctor(children=filter(lambda node: node is not None, concat(map(lambda child: fromNode(child, defines, slots), node))), **attrs)
-			node.inheritable = inheritable
-			return [node]
+			xnode = ctor(**attrs)
+			if isinstance(xnode, nodes.Generator):
+				xnode.children = wrapGenerator(node.tag, node, defines)
+			else:
+				xnode.children = [node for node in concat(fromNode(child, defines, parent=xnode) for child in node) if node is not None]
+			xnode.inheritable = inheritable
+			return [xnode]
 		else:
 			raise ValueError("%s is not a container" % node.tag)
 
@@ -118,58 +122,30 @@ def fromNode(node, defines, slots):
 	node.inheritable = inheritable
 	return [node]
 
-def getInnerText(node, slots):
-	if node.tag == "Slot":
-		name = node.attrib.get("name", "")
-
-		if name not in slots and name not in special_slots:
-			raise ValueError("Unknown slot :%s" % name)
-
-		slot = slots.get(name, special_slots.get(name))
-
-		if isinstance(slot, str) or isinstance(slot, unicode):
-			return slots[name], [dict(name=name, value=slots[name])]
-		elif slot["node"].tag == "Slot":
-			# Recursive slot
-			slot_value, slot_value_slots = getInnerText(slot["node"], slot["slots"])
-			return slot_value, [dict(name=name, value=slot_value_slots)]
-		else:
-			raise ValueError("Slot :%s is a node, so it cannot be used inside text container" % name)
-
-	value = ""
+def getInnerText(node, context):
 	value_slots = []
 
 	for child in node.xpath("child::node()"):
 		if isinstance(child, str) or isinstance(child, unicode):
-			value += child
-			value_slots += child
+			value_slots.append(child)
 		elif child.tag == etree.Comment:
 			pass
 		elif child.tag == "Slot":
-			slot_value, slot_value_slots = getInnerText(child, slots)
-
-			value += slot_value
-			value_slots += slot_value_slots
+			name = child.attrib.get("name", "")
+			value_slots.append(Slot(name, context=context))
 		else:
 			raise ValueError("Text container must contain text")
 
-	return value, value_slots
+	return value_slots
 
-def filterAttrs(node, slots):
+def filterAttrs(node, context):
 	attrs = {}
 	inheritable = {}
 	all_attrs = {}
 
 	for name, value in node.attrib.items():
 		if name[0] == ":": # Attribute name starts with colon, use slot
-			try:
-				value = slots[value]
-			except KeyError:
-				try:
-					value = special_slots[value]
-				except KeyError:
-					raise ValueError("Unknown slot :%s" % value)
-
+			value = Slot(value, context=context)
 			name = name[1:]
 
 		if name.startswith("inherit-"):
@@ -181,56 +157,18 @@ def filterAttrs(node, slots):
 
 	return attrs, inheritable, all_attrs
 
-def handleRange(node, defines, slots, attrs):
-	slot = attrs.get("slot", None)
-
-	try:
-		from_ = int(attrs["from"])
-	except ValueError:
-		raise ValueError("'from' attribute of <Range> must be an integer")
-	except KeyError:
-		raise ValueError("<Range> must contain 'from' attribute")
-
-	try:
-		to = int(attrs["to"])
-	except ValueError:
-		raise ValueError("'to' attribute of <Range> must be an integer")
-	except KeyError:
-		raise ValueError("<Range> must contain 'to' attribute")
-
-	try:
-		step = int(attrs["step"])
-	except ValueError:
-		raise ValueError("'step' attribute of <Range> must be an integer")
-	except KeyError:
-		step = 1
-
-	res = []
-	new_slots = dict(**slots)
-	for i in range(from_, to, step):
-		if slot is not None:
-			new_slots[slot] = str(i)
-
-		children = []
-		for child in node:
-			children += fromNode(child, defines, new_slots)
-
-		for pos, child in enumerate(children):
-			container = nodes.Container(children=[child])
-			container.type = "range"
-			container.range_value = i
-			container.range_begin = pos == 0
-			res.append(container)
-	return res
-
-def handleDefine(node, defines, slots, all_attrs):
+def handleDefine(node, defines, all_attrs, parent):
 	if len(node) == 1:
 		if node[0].tag == "Range":
 			raise ValueError("Cannot guarantee that <Range> will result in 0 or 1 node, which are allowed as <Slot /> inside <Define>")
 		elif node.text is not None and node.text.strip() != "":
 			raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
 
-		all_attrs[""] = dict(node=node[0], slots=slots)
+		child = fromNode(node[0], defines, parent=parent)[0]
+		if isinstance(child, Slot):
+			all_attrs[""] = child
+		else:
+			all_attrs[""] = dict(node=child, context=parent)
 	elif node.text is not None and node.text.strip() != "":
 		all_attrs[""] = node.text
 	elif len(node) > 1:
@@ -249,11 +187,31 @@ def handleDefine(node, defines, slots, all_attrs):
 			raise ValueError("Unknown slot :%s passed to <Define name='%s'> as slot" % (name, node.tag))
 		slots[name] = value
 
-	children = fromNode(defines[node.tag]["node"], defines, slots)
-	container = nodes.Container(children=children)
+	# We can only use context of the parent, so if the root of the <Define>
+	# uses slots, it will use the wrong parent for context. Instead, we can
+	# wrap it in a <Container> and use the container as context.
+	container = nodes.Container()
 	container.type = "define"
-	container.define_name = node.tag
+	container.slot_context = slots
+	container.inherit_slots = False
+
+	xnode = fromNode(defines[node.tag]["node"], defines, parent=container)
+	container.children = xnode
 	return [container]
+
+def wrapGenerator(type, node, defines):
+	# We can only use context of the parent, so if the generator changes
+	# slots, it will use the wrong parent for context. Instead, we can
+	# wrap it in a <Container> and use the container as context.
+
+	res = []
+	for child in node:
+		container = nodes.Container()
+		container.type = type
+		container.children = fromNode(child, defines, parent=container)
+		res.append(container)
+
+	return res
 
 def concat(arrs):
 	res = []
