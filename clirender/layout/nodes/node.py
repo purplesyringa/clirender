@@ -18,6 +18,30 @@ class Node(object):
 	def render(self, layout, dry_run=False):
 		raise NotImplementedError
 
+	def get(self, attr):
+		from ..slot import Slot
+
+		value = getattr(self, attr)
+		while isinstance(value, Slot):
+			value = value.evaluate()
+
+		if callable(value):
+			value = value()
+
+		return value
+
+	def getValue(self):
+		from ..slot import Slot
+
+		res = ""
+		for part in self.value:
+			while isinstance(part, Slot):
+				part = part.evaluate()
+
+			res += part
+
+		return res
+
 	def inherit(self, attr):
 		node = self
 
@@ -39,7 +63,17 @@ class Node(object):
 
 				node = parent
 		except AttributeError:
-			return value
+			pass
+
+		from ..slot import Slot
+		while isinstance(value, Slot):
+			value = value.evaluate()
+
+		try:
+			if isinstance(value, Node) and value.strip().lower() == "inherit":
+				return value.inherit(attr)
+		except AttributeError:
+			pass
 
 		return value
 
@@ -50,18 +84,39 @@ class Node(object):
 		res = []
 		for child in self.children:
 			if isinstance(child, Generator):
+				child.slot_context = self.slot_context
 				res += child.generate()
 			else:
-				res.append(dict(node=child, slots=self.slot_context))
+				res.append(child)
 
 		return res
 
 
 	def renderChild(self, layout, child, dry_run, offset, boundary_left_top, boundary_right_bottom, stretch):
-		child["node"].render_offset = offset
-		child["node"].render_boundary_left_top = boundary_left_top
-		child["node"].render_boundary_right_bottom = boundary_right_bottom
-		child["node"].render_stretch = stretch
-		child["node"].parent = self
+		from ..slot import Slot
+		if isinstance(child, Slot):
+			node = child.evaluate()
+			if isinstance(node, str) or isinstance(node, unicode):
+				raise ValueError("Cannot render text inside a node")
 
-		return child["node"].render(layout, dry_run=dry_run)
+			node.slot_context = child.context.slot_context
+			node.inherit_slots = False
+
+			return self.renderChild(
+				layout, node, dry_run=dry_run,
+
+				offset=offset,
+				boundary_left_top=boundary_left_top,
+				boundary_right_bottom=boundary_right_bottom,
+				stretch=stretch
+			)
+
+		child.render_offset = offset
+		child.render_boundary_left_top = boundary_left_top
+		child.render_boundary_right_bottom = boundary_right_bottom
+		child.render_stretch = stretch
+		child.parent = self
+		if getattr(child, "inherit_slots", True):
+			child.slot_context = self.slot_context
+
+		return child.render(layout, dry_run=dry_run)

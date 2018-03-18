@@ -15,10 +15,10 @@ class AlignRight(Rect):
 		child_width, child_height = self.guessContainerSize(layout)
 
 		# Guess container size
-		if self.height is None:
+		if self.get("height") is None:
 			height = child_height
 		else:
-			height = self.height
+			height = self.get("height")
 
 		x1, y1, x2, y2 = super(AlignRight, self).render(layout, dry_run=dry_run, height=height)
 		self.renderChildren(layout, x1, y1, x2, y2, dry_run=dry_run, child_width=child_width)
@@ -26,7 +26,7 @@ class AlignRight(Rect):
 		return x1, y1, x2, y2
 
 	def guessContainerSize(self, layout):
-		x1, y1, x2, y2 = super(AlignRight, self).render(layout, dry_run=True, width=self.width, height=self.height or 0)
+		x1, y1, x2, y2 = super(AlignRight, self).render(layout, dry_run=True, width=self.get("width"), height=self.get("height") or 0)
 
 		return self.renderChildren(layout, x1, y1, x2, y2, dry_run=True)
 
@@ -42,11 +42,11 @@ class AlignRight(Rect):
 
 			boundary_left_top=(
 				x1,
-				y1 if self.height is not None else self.render_boundary_left_top[1]
+				y1 if self.get("height") is not None else self.render_boundary_left_top[1]
 			),
 			boundary_right_bottom=(
 				x2,
-				y2 if self.height is not None else self.render_boundary_right_bottom[1]
+				y2 if self.get("height") is not None else self.render_boundary_right_bottom[1]
 			),
 
 			stretch=self.render_stretch

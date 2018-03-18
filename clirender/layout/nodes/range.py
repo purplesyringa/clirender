@@ -15,32 +15,36 @@ class Range(Generator):
 
 	def generate(self):
 		try:
-			from_ = int(self.from_)
+			from_ = int(self.get("from_"))
 		except ValueError:
 			raise ValueError("'from' attribute of <Range> must be an integer")
 
 		try:
-			to = int(self.to)
+			to = int(self.get("to"))
 		except ValueError:
 			raise ValueError("'to' attribute of <Range> must be an integer")
 
 		try:
-			step = int(self.step)
+			step = int(self.get("step"))
 		except ValueError:
 			raise ValueError("'step' attribute of <Range> must be an integer")
 
-		#new_slots = dict(**slots)
+		new_slots = dict(**self.slot_context)
 
 		res = []
 		for i in range(from_, to, step):
-			if self.slot is not None:
-				pass#new_slots[self.slot] = i
+			if self.get("slot") is not None:
+				new_slots[self.get("slot")] = str(i)
 
 			for pos, child in enumerate(self.children):
 				container = Container(children=[child])
 				container.type = "range"
 				container.range_value = i
 				container.range_begin = pos == 0
-				res.append(dict(node=container, slots=None))
+
+				container.slot_context = dict(**new_slots)
+				container.inherit_slots = False
+
+				res.append(container)
 
 		return res
