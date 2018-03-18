@@ -12,6 +12,22 @@ def getDependencies(libs):
 		res.append(lib)
 	return res
 
+def getAdditionalNodes(libs):
+	from ..nodes import Node
+
+	nodes = {}
+	for lib in getDependencies(libs):
+		info = getLibInfo(lib)
+
+		for obj in dir(info):
+			try:
+				if issubclass(getattr(info, obj), Node):
+					nodes[obj] = getattr(info, obj)
+			except TypeError:
+				pass
+
+	return nodes
+
 def render(layout, libs):
 	libs = getDependencies(libs)
 
@@ -19,6 +35,7 @@ def render(layout, libs):
 	for lib in libs:
 		lib_instances[lib] = getLibInfo(lib)(layout)
 
+	layout.libs = lib_instances
 	layout.render()
 
 	if any(hasattr(lib, "loop") for lib in lib_instances.values()):
