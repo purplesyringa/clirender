@@ -3,7 +3,7 @@ from node import Node
 class NoDefault(object):
 	pass
 
-def fromXml(elem, slots, name, defines, container):
+def fromXml(elem, slots, name, defines, container, additional_nodes):
 	class FromXml(Node):
 		def __init__(self, **attrs):
 			if self.text_container:
@@ -35,7 +35,7 @@ def fromXml(elem, slots, name, defines, container):
 
 		def render(self, *args, **kwargs):
 			from ..xml_parser import handleElement
-			node = handleElement(elem, defines=defines, slots=self.slots)[0]
+			node = handleElement(elem, defines=defines, slots=self.slots, additional_nodes=additional_nodes)[0]
 
 			node.render_offset = self.render_offset
 			node.render_boundary_left_top = self.render_boundary_left_top

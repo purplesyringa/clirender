@@ -10,7 +10,7 @@ class Range(Generator):
 		self.step = step
 		self.slot = slot
 
-	def generate(self, slots, defines):
+	def generate(self, slots, defines, additional_nodes):
 		from ..xml_parser import handleElement
 
 		try:
@@ -36,6 +36,6 @@ class Range(Generator):
 				new_slots[self.slot] = str(i)
 
 			for child in self.children:
-				res += handleElement(child, defines, dict(**new_slots))
+				res += handleElement(child, defines, dict(**new_slots), additional_nodes=additional_nodes)
 
 		return res

@@ -6,7 +6,8 @@ from clirender.layout.libs import render
 with open(sys.argv[1]) as f:
 	xml = f.read()
 
-root, libs = xml_parser.fromXml(xml)
+libs = xml_parser.gatherLibs(xml)
+root = xml_parser.fromXml(xml, additional_nodes={})
 
 layout = Layout(root)
 render(layout, libs)

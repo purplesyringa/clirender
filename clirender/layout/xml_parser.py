@@ -9,14 +9,20 @@ special_slots = {
 
 NoDefault = nodes.NoDefault
 
-def fromXml(code):
-	parser = etree.XMLParser(recover=True)
-	root = etree.fromstring(code, parser=parser)
+def gatherLibs(node):
+	if isinstance(node, str) or isinstance(node, unicode):
+		parser = etree.XMLParser(recover=True)
+		node = etree.fromstring(node, parser=parser)
 
 	libs = []
-	for node in root.findall("Use"):
+	for node in node.findall("Use"):
 		if "lib" in node.attrib:
 			libs.append(node.attrib["lib"])
+	return libs
+
+def fromXml(code, additional_nodes={}):
+	parser = etree.XMLParser(recover=True)
+	root = etree.fromstring(code, parser=parser)
 
 	define_nodes = root.findall("Define")
 
@@ -24,6 +30,8 @@ def fromXml(code):
 		if "name" not in node.attrib:
 			raise ValueError("<Define> without 'name' attribute")
 		elif getattr(nodes, node.tag, None) is not None:
+			raise ValueError("Cannot <Define> core node %s" % node.tag)
+		elif additional_nodes.get(node.tag, None) is not None:
 			raise ValueError("Cannot <Define> core node %s" % node.tag)
 
 	define_nodes.sort(key=lambda define: define.attrib["name"])
@@ -68,11 +76,11 @@ def fromXml(code):
 		if children[0].tag == "Range":
 			raise ValueError("<Define> must have exactly one child: cannot guarantee that <Range> is always one child")
 
-		defines[node.attrib["name"]] = nodes.fromXml(elem=children[0], slots=slots, defines=defines, name=node.attrib["name"], container=container)
+		defines[node.attrib["name"]] = nodes.fromXml(elem=children[0], slots=slots, defines=defines, name=node.attrib["name"], container=container, additional_nodes=additional_nodes)
 
-	return handleElement(root, defines, slots={})[0]
+	return handleElement(root, defines, slots={}, additional_nodes={})[0]
 
-def handleElement(node, defines, slots):
+def handleElement(node, defines, slots, additional_nodes):
 	if node.tag in ["Define", "Use"]:
 		return []
 	elif node.tag is etree.Comment:
@@ -119,10 +127,12 @@ def handleElement(node, defines, slots):
 	if ctor is None:
 		ctor = defines.get(node.tag, None)
 	if ctor is None:
+		ctor = additional_nodes.get(node.tag, None)
+	if ctor is None:
 		raise ValueError("Unknown node <%s>" % node.tag)
 
 	if issubclass(ctor, nodes.Generator):
-		return handleGenerator(node, defines, slots, ctor=ctor, attrs=attrs, inheritable=inheritable)
+		return handleGenerator(node, defines, slots, ctor=ctor, attrs=attrs, inheritable=inheritable, additional_nodes=additional_nodes)
 
 	result = None
 	if ctor.text_container:
@@ -136,7 +146,7 @@ def handleElement(node, defines, slots):
 
 		children = []
 		for child in node:
-			children += handleElement(child, defines, slots)
+			children += handleElement(child, defines, slots, additional_nodes=additional_nodes)
 
 		result = ctor(children=children, **attrs)
 	else:
@@ -150,10 +160,10 @@ def handleElement(node, defines, slots):
 	result.inheritable = inheritable
 	return [result]
 
-def handleGenerator(node, defines, slots, ctor, attrs, inheritable):
+def handleGenerator(node, defines, slots, ctor, attrs, inheritable, additional_nodes):
 	node = ctor(children=list(node), **attrs)
 	node.inheritable = inheritable
-	return node.generate(slots, defines)
+	return node.generate(slots, defines, additional_nodes=additional_nodes)
 
 def getTextInside(node, slots, allow_nodes=False):
 	text = ""
