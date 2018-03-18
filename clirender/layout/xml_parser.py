@@ -50,6 +50,8 @@ def fromXml(code):
 
 		if len(children) != 1:
 			raise ValueError("<Define> must have exactly one child")
+		if children[0].tag == "Range":
+			raise ValueError("<Define> must have exactly one child: cannot guarantee that <Range> is always one child")
 
 		defines[node.attrib["name"]] = dict(node=children[0], slots=slots)
 
