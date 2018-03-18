@@ -164,7 +164,11 @@ def handleDefine(node, defines, all_attrs, parent):
 		elif node.text is not None and node.text.strip() != "":
 			raise ValueError("Only 1 node allowed as <Slot /> inside <Define>")
 
-		all_attrs[""] = fromNode(node[0], defines, parent=parent)[0]
+		child = fromNode(node[0], defines, parent=parent)[0]
+		if isinstance(child, Slot):
+			all_attrs[""] = child
+		else:
+			all_attrs[""] = dict(node=child, context=parent)
 	elif node.text is not None and node.text.strip() != "":
 		all_attrs[""] = node.text
 	elif len(node) > 1:

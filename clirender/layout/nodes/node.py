@@ -99,11 +99,11 @@ class Node(object):
 			if isinstance(node, str) or isinstance(node, unicode):
 				raise ValueError("Cannot render text inside a node")
 
-			node.slot_context = child.context.slot_context
-			node.inherit_slots = False
+			node["node"].slot_context = node["context"].slot_context
+			node["node"].inherit_slots = False
 
 			return self.renderChild(
-				layout, node, dry_run=dry_run,
+				layout, node["node"], dry_run=dry_run,
 
 				offset=offset,
 				boundary_left_top=boundary_left_top,
