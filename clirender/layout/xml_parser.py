@@ -112,6 +112,9 @@ def handleElement(node, defines, slots):
 	if ctor is None:
 		raise ValueError("Unknown node <%s>" % node.tag)
 
+	if issubclass(ctor, nodes.Generator):
+		return handleGenerator(node, defines, slots, ctor=ctor, attrs=attrs, inheritable=inheritable)
+
 	result = None
 	if ctor.text_container:
 		text_inside = getTextInside(node, slots=slots)
@@ -137,6 +140,11 @@ def handleElement(node, defines, slots):
 
 	result.inheritable = inheritable
 	return [result]
+
+def handleGenerator(node, defines, slots, ctor, attrs, inheritable):
+	node = ctor(children=list(node), **attrs)
+	node.inheritable = inheritable
+	return node.generate(slots, defines)
 
 def getTextInside(node, slots, allow_nodes=False):
 	text = ""
