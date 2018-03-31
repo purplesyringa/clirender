@@ -336,7 +336,7 @@ Slot ` ` (empty string) can also be used:
 ```xml
 <Container>
     <Define name="Hello">
-        <Slot define="" /> <!-- Define empty slot -->
+        <Slot define="" container="text" /> <!-- Define empty slot for text -->
         <Text color="red" bg="white">Hello, <Slot />!</Text>
     </Define>
 
@@ -352,16 +352,16 @@ Slot ` ` will also work for nodes, not text:
 ```xml
 <Container>
     <Define name="Hello">
-        <Slot define="" />
+        <Slot define="" container="text" />
         <Text color="red" bg="white">Hello, <Slot />!</Text>
     </Define>
     <Define name="Bye">
-        <Slot define="" />
+        <Slot define="" container="text" />
         <Text color="green" bg="white">Bye, <Slot />!</Text>
     </Define>
 
     <Define name="Brackets">
-        <Slot define="" />
+        <Slot define="" container="node" /> <!-- Define slot for nodes -->
 
         <StackPanel orientation="horizontal">
             <Text bg="yellow" color="black">[</Text>
@@ -381,7 +381,7 @@ Slots may also have default values:
 ```xml
 <Container>
     <Define name="Hello">
-        <Slot define="" default="world" />
+        <Slot define="" container="text" default="world" />
         <Text color="red" bg="white">Hello, <Slot />!</Text>
     </Define>
 
@@ -400,7 +400,7 @@ Using slots for nodes and text is awesome, but what about e.g. colors?
 ```xml
 <Container>
     <Define name="Hello">
-        <Slot define="" default="world" />
+        <Slot define="" container="text" default="world" />
         <Slot define="fg" default="red" />
         <Text :color="fg" bg="white">Hello, <Slot />!</Text>
     </Define>
