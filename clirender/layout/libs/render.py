@@ -13,7 +13,7 @@ def getDependencies(libs):
 	return res
 
 def getAdditionalNodes(libs):
-	from ..nodes import Node
+	from ..nodes import Node, Generator
 
 	nodes = {}
 	for lib in getDependencies(libs):
@@ -21,7 +21,7 @@ def getAdditionalNodes(libs):
 
 		for obj in dir(info):
 			try:
-				if issubclass(getattr(info, obj), Node):
+				if issubclass(getattr(info, obj), (Node, Generator)):
 					nodes[obj] = getattr(info, obj)
 			except TypeError:
 				pass
