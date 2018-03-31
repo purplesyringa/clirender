@@ -31,6 +31,7 @@ def fromXml(code):
 	defines = {}
 	for node in define_nodes:
 		slots = {}
+		container = ""
 
 		children = list(node)
 		for child in children:
@@ -45,6 +46,16 @@ def fromXml(code):
 						slot_name = child.attrib[":default"]
 						slots[name] = slots.get(slot_name, special_slots.get(slot_name, NoDefault))
 
+				if name == "":
+					if "container" not in child.attrib:
+						raise ValueError("Deprecated: Set container=node or container=text for <Define name='' />")
+					elif child.attrib["container"].lower() == "node":
+						container = "node"
+					elif child.attrib["container"].lower() == "text":
+						container = "text"
+					else:
+						raise ValueError("Only 'node' or 'text' values are accepted for 'container' attribute of <Define name='' />")
+
 		children = filter(lambda child: (child.tag != "Slot" or "define" not in child.attrib) and child.tag != etree.Comment, children)
 
 		if len(children) != 1:
@@ -52,7 +63,7 @@ def fromXml(code):
 		if children[0].tag == "Range":
 			raise ValueError("<Define> must have exactly one child: cannot guarantee that <Range> is always one child")
 
-		defines[node.attrib["name"]] = nodes.fromXml(node=children[0], slots=slots, defines=defines, name=node.attrib["name"])
+		defines[node.attrib["name"]] = nodes.fromXml(elem=children[0], slots=slots, defines=defines, name=node.attrib["name"], container=container)
 
 	return handleElement(root, defines, slots={})[0]
 
@@ -102,17 +113,7 @@ def handleElement(node, defines, slots):
 		raise ValueError("Unknown node <%s>" % node.tag)
 
 	result = None
-	if ctor.text_container and ctor.container:
-		text_inside = getTextInside(node, slots=slots, allow_nodes=True)
-		if len(node) > 0 and text_inside.strip() != "":
-			raise ValueError("Nodes and text inside <%s>" % node.tag)
-
-		children = []
-		for child in node:
-			children += handleElement(child, defines, slots)
-
-		result = ctor(_value=children if len(children) > 0 else text_inside, **attrs)
-	elif ctor.text_container:
+	if ctor.text_container:
 		text_inside = getTextInside(node, slots=slots)
 
 		result = ctor(value=text_inside, **attrs)
@@ -139,24 +140,35 @@ def handleElement(node, defines, slots):
 
 def getTextInside(node, slots, allow_nodes=False):
 	text = ""
+	had_nodes = False
+
 	for item in node.xpath("child::node()"):
 		if isinstance(item, str) or isinstance(item, unicode):
 			text += item
+
+			if allow_nodes is None and text.strip() != "" and had_nodes:
+				raise ValueError("Nodes and text inside <%s>" % node.tag)
 		elif item.tag is etree.Comment:
 			pass
 		elif item.tag == "Slot":
 			name = item.attrib.get("name", "")
 			if name in slots:
 				if slots[name] is NoDefault:
-					raise ValueError("Required slot :%s was not passed" % name)
+					raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
 				elif isinstance(slots[name], str) or isinstance(slots[name], unicode):
 					text += slots[name]
-				elif not allow_nodes:
+				elif allow_nodes is None and had_nodes:
+					raise ValueError("Nodes and text inside <%s>" % node.tag)
+				elif allow_nodes is False:
 					raise ValueError("Nodes inside <%s>" % node.tag)
 			else:
 				raise ValueError("Unknown slot :%s" % name)
 		else:
-			if not allow_nodes:
+			if allow_nodes is None and text.strip() != "":
+				raise ValueError("Nodes and text inside <%s>" % node.tag)
+			elif allow_nodes is False:
 				raise ValueError("Nodes inside <%s>" % node.tag)
+
+			had_nodes = True
 
 	return text
