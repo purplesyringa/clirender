@@ -54,17 +54,17 @@ def fromXml(code):
 
 		defines[node.attrib["name"]] = nodes.fromXml(node=children[0], slots=slots, defines=defines, name=node.attrib["name"])
 
-	return handleElement(root, defines, slots={})
+	return handleElement(root, defines, slots={})[0]
 
 
 def handleElement(node, defines, slots):
 	if node.tag == "Define":
-		return None
+		return []
 	elif node.tag is etree.Comment:
-		return None
+		return []
 	elif node.tag == "Slot":
 		if "define" in node.attrib:
-			return None
+			return []
 
 		name = node.attrib.get("name", "")
 		if name not in slots:
@@ -73,7 +73,7 @@ def handleElement(node, defines, slots):
 		if isinstance(slots[name], str) or isinstance(slots[name], unicode):
 			raise ValueError("Unexpected string slot :%s" % name)
 
-		return slots[name]
+		return [slots[name]]
 
 	attrs = {}
 	inheritable = {}
@@ -109,9 +109,7 @@ def handleElement(node, defines, slots):
 
 		children = []
 		for child in node:
-			element = handleElement(child, defines, slots)
-			if element is not None:
-				children.append(element)
+			children += handleElement(child, defines, slots)
 
 		result = ctor(_value=children if len(children) > 0 else text_inside, **attrs)
 	elif ctor.text_container:
@@ -125,9 +123,7 @@ def handleElement(node, defines, slots):
 
 		children = []
 		for child in node:
-			element = handleElement(child, defines, slots)
-			if element is not None:
-				children.append(element)
+			children += handleElement(child, defines, slots)
 
 		result = ctor(children=children, **attrs)
 	else:
@@ -139,7 +135,7 @@ def handleElement(node, defines, slots):
 		result = ctor(**attrs)
 
 	result.inheritable = inheritable
-	return result
+	return [result]
 
 def getTextInside(node, slots, allow_nodes=False):
 	text = ""

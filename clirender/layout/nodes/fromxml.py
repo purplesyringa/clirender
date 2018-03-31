@@ -33,7 +33,7 @@ def fromXml(node, slots, name, defines):
 
 		def render(self, *args, **kwargs):
 			from ..xml_parser import handleElement
-			node = handleElement(self.node, defines=defines, slots=self.slots)
+			node = handleElement(self.node, defines=defines, slots=self.slots)[0]
 
 			node.render_offset = self.render_offset
 			node.render_boundary_left_top = self.render_boundary_left_top
