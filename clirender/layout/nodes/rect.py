@@ -13,9 +13,9 @@ class Rect(Node):
 
 	def render(self, layout, dry_run=False, width=None, height=None):
 		if width is None:
-			width = self.get("width")
+			width = self.width
 		if height is None:
-			height = self.get("height")
+			height = self.height
 
 		width  = layout.calcRelativeSize(width,  self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
 		height = layout.calcRelativeSize(height, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1], self.render_stretch)
