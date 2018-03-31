@@ -83,6 +83,8 @@ def handleElement(node, defines, slots):
 
 		if isinstance(slots[name], str) or isinstance(slots[name], unicode):
 			raise ValueError("Unexpected string slot :%s" % name)
+		elif slots[name] is NoDefault:
+			raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
 
 		return [slots[name]]
 
@@ -92,6 +94,9 @@ def handleElement(node, defines, slots):
 		if attr.startswith(":"):
 			attr = attr[1:]
 			try:
+				if slots[value] is NoDefault:
+					raise ValueError("Required slot :%s was not passed (from <%s>)" % (value, node.tag))
+
 				value = slots[value]
 			except KeyError:
 				raise ValueError("Unknown slot :%s" % value)
