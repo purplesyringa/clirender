@@ -13,8 +13,7 @@ def fromXml(node, slots, name, defines):
 			self.node = node
 
 			if isinstance(_value, str) or isinstance(_value, unicode):
-				if _value.strip() != "":
-					attrs[""] = _value
+				attrs[""] = _value
 			elif len(_value) > 1:
 				raise ValueError("Too many nodes in <%s>" % name)
 			elif len(_value) == 1:
@@ -22,7 +21,7 @@ def fromXml(node, slots, name, defines):
 
 			self.slots = dict(**slots)
 			for attr, value in attrs.items():
-				if attr not in self.slots:
+				if attr not in self.slots and attr != "":
 					raise ValueError("Unexpected slot :%s" % attr)
 
 				self.slots[attr] = value
