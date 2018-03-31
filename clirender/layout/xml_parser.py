@@ -78,7 +78,7 @@ def fromXml(code, additional_nodes={}):
 
 		defines[node.attrib["name"]] = nodes.fromXml(elem=children[0], slots=slots, defines=defines, name=node.attrib["name"], container=container, additional_nodes=additional_nodes)
 
-	return handleElement(root, defines, slots={}, additional_nodes={})[0]
+	return handleElement(root, defines, slots={}, additional_nodes=additional_nodes)[0]
 
 def handleElement(node, defines, slots, additional_nodes):
 	if node.tag in ["Define", "Use"]:
@@ -118,7 +118,7 @@ def handleElement(node, defines, slots, additional_nodes):
 			inheritable[attr] = value
 		else:
 			# Escape keywods
-			if attr in ("from"):
+			if attr in ("from", "is"):
 				attr += "_"
 
 			attrs[attr] = value
