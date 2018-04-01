@@ -7,6 +7,11 @@ class Generator(object):
 		self.slots = slots
 		self._cached = None
 
+		self.init(**kwargs)
+
+	def init(self):
+		pass
+
 	def generate(self):
 		raise NotImplementedError
 

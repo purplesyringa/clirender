@@ -36,8 +36,7 @@ class TabSwitch(Library):
 		container = True
 		text_container = False
 
-		def __init__(self, **kwargs):
-			super(TabSwitch.Focusable, self).__init__(**kwargs)
+		def init(self, **kwargs):
 			TabSwitch.focusable.append(self)
 
 		def generate(self):
