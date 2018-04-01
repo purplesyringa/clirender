@@ -21,9 +21,16 @@ class TabSwitch(Library):
 			self.tab()
 
 	def tab(self):
+		old = TabSwitch.focusable[TabSwitch.focused_id]
+
 		TabSwitch.focused_id += 1
 		if TabSwitch.focused_id >= len(TabSwitch.focusable):
 			TabSwitch.focused_id = 0
+
+		new = TabSwitch.focusable[TabSwitch.focused_id]
+
+		old.revoke()
+		new.revoke()
 
 	class Focusable(Generator):
 		container = True
