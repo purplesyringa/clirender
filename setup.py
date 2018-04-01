@@ -7,7 +7,7 @@ except:
 from setuptools import setup, find_packages
 setup(
 	name = "clirender",
-	version = "0.14",
+	version = "0.15",
 	description = "CLI rendering engine for Python",
 	long_description = readme,
 	install_requires = ["colorama", "numexpr", "lxml"],
