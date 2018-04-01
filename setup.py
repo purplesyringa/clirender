@@ -2,12 +2,15 @@ try:
 	import pypandoc
 	readme = pypandoc.convert_file("README.md", "rst")
 except:
-	readme = open("README.md").read()
+	try:
+		readme = open("README.md").read()
+	except:
+		readme = "clirender"
 
 from setuptools import setup, find_packages
 setup(
 	name = "clirender",
-	version = "0.16",
+	version = "0.17",
 	description = "CLI rendering engine for Python",
 	long_description = readme,
 	install_requires = ["colorama", "numexpr", "lxml"],
