@@ -1,7 +1,6 @@
 from lxml import etree
 
 import nodes
-from slot import Slot
 
 special_slots = {
 	"__unset__": None
