@@ -1,10 +1,10 @@
 from library import Library
+import all
 
 def getLibInfo(lib):
 	if isinstance(lib, type) and issubclass(lib, Library):
 		return lib
 
-	import all
 	if not hasattr(all, lib):
 		raise AttributeError("No %s lib" % lib)
 	return getattr(all, lib)
@@ -32,6 +32,9 @@ def getAdditionalNodes(libs):
 				pass
 
 	return nodes
+
+def register(name, lib):
+	setattr(all, name, lib)
 
 def render(layout, libs):
 	libs = getDependencies(libs)
