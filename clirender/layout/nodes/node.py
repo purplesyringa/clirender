@@ -32,6 +32,7 @@ class Node(object):
 					generated = child._cached
 				else:
 					child.parent = self
+					child.layout = self.layout
 					generated = child.generate()
 
 				child._cached = generated
@@ -46,7 +47,7 @@ class Node(object):
 
 		return children
 
-	def render(self, layout, dry_run=False):
+	def render(self, dry_run=False):
 		raise NotImplementedError
 
 	def inherit(self, attr):
@@ -81,11 +82,12 @@ class Node(object):
 		return value
 
 
-	def renderChild(self, layout, child, dry_run, offset, boundary_left_top, boundary_right_bottom, stretch):
+	def renderChild(self, child, dry_run, offset, boundary_left_top, boundary_right_bottom, stretch):
 		child.render_offset = offset
 		child.render_boundary_left_top = boundary_left_top
 		child.render_boundary_right_bottom = boundary_right_bottom
 		child.render_stretch = stretch
 		child.parent = self
+		child.layout = self.layout
 
-		return child.render(layout, dry_run=dry_run)
+		return child.render(dry_run=dry_run)

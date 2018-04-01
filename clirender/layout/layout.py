@@ -20,7 +20,8 @@ class Layout(object):
 		self.root.parent = None
 		self.root.render_stretch = self.screen.terminal_size[0]
 
-		self.root.render(self)
+		self.root.layout = self
+		self.root.render()
 
 	def calcRelativeSize(self, size, total, stretch=None, expression=True):
 		if not expression:
