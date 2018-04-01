@@ -9,7 +9,18 @@ special_slots = {
 
 NoDefault = nodes.NoDefault
 
-def fromXml(code):
+def gatherLibs(node):
+	if isinstance(node, (str, unicode)):
+		parser = etree.XMLParser(recover=True)
+		node = etree.fromstring(node, parser=parser)
+
+	libs = []
+	for node in node.findall("Use"):
+		if "lib" in node.attrib:
+			libs.append(node.attrib["lib"])
+	return libs
+
+def fromXml(code, additional_nodes={}):
 	parser = etree.XMLParser(recover=True)
 	root = etree.fromstring(code, parser=parser)
 
@@ -19,6 +30,8 @@ def fromXml(code):
 		if "name" not in node.attrib:
 			raise ValueError("<Define> without 'name' attribute")
 		elif getattr(nodes, node.tag, None) is not None:
+			raise ValueError("Cannot <Define> core node %s" % node.tag)
+		elif additional_nodes.get(node.tag, None) is not None:
 			raise ValueError("Cannot <Define> core node %s" % node.tag)
 
 	define_nodes.sort(key=lambda define: define.attrib["name"])
@@ -63,13 +76,12 @@ def fromXml(code):
 		if children[0].tag == "Range":
 			raise ValueError("<Define> must have exactly one child: cannot guarantee that <Range> is always one child")
 
-		defines[node.attrib["name"]] = nodes.fromXml(elem=children[0], slots=slots, defines=defines, name=node.attrib["name"], container=container)
+		defines[node.attrib["name"]] = nodes.fromXml(elem=children[0], slots=slots, defines=defines, name=node.attrib["name"], container=container, additional_nodes=additional_nodes)
 
-	return handleElement(root, defines, slots={})[0]
+	return handleElement(root, defines, slots={}, additional_nodes=additional_nodes)[0]
 
-
-def handleElement(node, defines, slots):
-	if node.tag == "Define":
+def handleElement(node, defines, slots, additional_nodes):
+	if node.tag in ["Define", "Use"]:
 		return []
 	elif node.tag is etree.Comment:
 		return []
@@ -81,7 +93,7 @@ def handleElement(node, defines, slots):
 		if name not in slots:
 			raise ValueError("Unknown slot :%s" % name)
 
-		if isinstance(slots[name], str) or isinstance(slots[name], unicode):
+		if isinstance(slots[name], (str, unicode)):
 			raise ValueError("Unexpected string slot :%s" % name)
 		elif slots[name] is NoDefault:
 			raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
@@ -106,7 +118,7 @@ def handleElement(node, defines, slots):
 			inheritable[attr] = value
 		else:
 			# Escape keywods
-			if attr in ("from"):
+			if attr in ("from", "is"):
 				attr += "_"
 
 			attrs[attr] = value
@@ -115,10 +127,12 @@ def handleElement(node, defines, slots):
 	if ctor is None:
 		ctor = defines.get(node.tag, None)
 	if ctor is None:
+		ctor = additional_nodes.get(node.tag, None)
+	if ctor is None:
 		raise ValueError("Unknown node <%s>" % node.tag)
 
 	if issubclass(ctor, nodes.Generator):
-		return handleGenerator(node, defines, slots, ctor=ctor, attrs=attrs, inheritable=inheritable)
+		return handleGenerator(node, defines, slots, ctor=ctor, attrs=attrs, inheritable=inheritable, additional_nodes=additional_nodes)
 
 	result = None
 	if ctor.text_container:
@@ -132,7 +146,7 @@ def handleElement(node, defines, slots):
 
 		children = []
 		for child in node:
-			children += handleElement(child, defines, slots)
+			children += handleElement(child, defines, slots, additional_nodes=additional_nodes)
 
 		result = ctor(children=children, **attrs)
 	else:
@@ -143,20 +157,31 @@ def handleElement(node, defines, slots):
 
 		result = ctor(**attrs)
 
+	result.slots = slots
+	result.defines = defines
+	result.additional_nodes = additional_nodes
 	result.inheritable = inheritable
 	return [result]
 
-def handleGenerator(node, defines, slots, ctor, attrs, inheritable):
-	node = ctor(children=list(node), **attrs)
+def handleGenerator(node, defines, slots, ctor, attrs, inheritable, additional_nodes):
+	if ctor.text_container:
+		node = ctor(value=getTextInside(node, slots, allow_nodes=False), slots=slots, **attrs)
+	elif ctor.container:
+		node = ctor(children=list(node), slots=slots, **attrs)
+	else:
+		node = ctor(slots=slots, **attrs)
+
+	node.defines = defines
+	node.additional_nodes = additional_nodes
 	node.inheritable = inheritable
-	return node.generate(slots, defines)
+	return [node]
 
 def getTextInside(node, slots, allow_nodes=False):
 	text = ""
 	had_nodes = False
 
 	for item in node.xpath("child::node()"):
-		if isinstance(item, str) or isinstance(item, unicode):
+		if isinstance(item, (str, unicode)):
 			text += item
 
 			if allow_nodes is None and text.strip() != "" and had_nodes:
@@ -168,7 +193,7 @@ def getTextInside(node, slots, allow_nodes=False):
 			if name in slots:
 				if slots[name] is NoDefault:
 					raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
-				elif isinstance(slots[name], str) or isinstance(slots[name], unicode):
+				elif isinstance(slots[name], (str, unicode)):
 					text += slots[name]
 				elif allow_nodes is None and had_nodes:
 					raise ValueError("Nodes and text inside <%s>" % node.tag)

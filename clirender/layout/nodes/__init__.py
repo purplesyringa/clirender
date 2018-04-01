@@ -4,5 +4,4 @@ from text import *
 from switch import *
 from container import *
 from alignright import *
-from range import *
 from fromxml import *

@@ -11,8 +11,40 @@ class Node(object):
 
 		self.inheritable = {}
 
-		self.children = children
+		self._children = children
 		self.value = value
+
+	@property
+	def children(self):
+		return self._get_children(self._children)
+
+	@children.setter
+	def children(self, children):
+		self._children = children
+
+	def _get_children(self, old):
+		from generator import Generator
+
+		children = []
+		for child in old:
+			if isinstance(child, Generator):
+				if child._cached is not None:
+					generated = child._cached
+				else:
+					child.parent = self
+					generated = child.generate()
+
+				child._cached = generated
+				for subchild in self._get_children(generated):
+					if not hasattr(subchild, "generated_by"):
+						subchild.generated_by = []
+					subchild.generated_by.append(child)
+
+					children.append(subchild)
+			else:
+				children.append(child)
+
+		return children
 
 	def render(self, layout, dry_run=False):
 		raise NotImplementedError
