@@ -2,6 +2,9 @@ from generator import Generator
 from container import Container
 
 class Range(Generator):
+	container = True
+	text_container = False
+
 	def __init__(self, from_, to, step=1, slot=None, children=[]):
 		super(Range, self).__init__(children=children)
 

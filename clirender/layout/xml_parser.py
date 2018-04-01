@@ -161,7 +161,13 @@ def handleElement(node, defines, slots, additional_nodes):
 	return [result]
 
 def handleGenerator(node, defines, slots, ctor, attrs, inheritable, additional_nodes):
-	node = ctor(children=list(node), **attrs)
+	if ctor.text_container:
+		node = ctor(value=getTextInside(node, slots, allow_nodes=False), **attrs)
+	elif ctor.container:
+		node = ctor(children=list(node), **attrs)
+	else:
+		node = ctor(**attrs)
+
 	node.inheritable = inheritable
 	return node.generate(slots, defines, additional_nodes=additional_nodes)
 
