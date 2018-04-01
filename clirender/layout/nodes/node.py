@@ -12,15 +12,11 @@ class Node(object):
 		self.inheritable = {}
 
 		self._children = children
-		self._cached_children = None
 		self.value = value
 
 	@property
 	def children(self):
-		if self._cached_children is None:
-			self._cached_children = self._get_children(self._children)
-
-		return self._cached_children
+		return self._get_children(self._children)
 
 	@children.setter
 	def children(self, children):
@@ -32,7 +28,19 @@ class Node(object):
 		children = []
 		for child in old:
 			if isinstance(child, Generator):
-				children += self._get_children(child.generate())
+				if child._cached is not None:
+					generated = child._cached
+				else:
+					child.parent = self
+					generated = child.generate()
+
+				child._cached = generated
+				for subchild in self._get_children(generated):
+					if not hasattr(subchild, "generated_by"):
+						subchild.generated_by = []
+					subchild.generated_by.append(child)
+
+					children.append(subchild)
 			else:
 				children.append(child)
 
