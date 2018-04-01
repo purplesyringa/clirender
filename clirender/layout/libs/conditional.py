@@ -11,8 +11,8 @@ class Conditional(Library):
 		container = True
 		text_container = False
 
-		def __init__(self, is_=None, children=[]):
-			super(Conditional.If, self).__init__(children=children)
+		def __init__(self, slots, is_=None, children=[]):
+			super(Conditional.If, self).__init__(children=children, slots=slots)
 
 			self.is_ = is_
 
@@ -50,8 +50,8 @@ class Conditional(Library):
 		container = True
 		text_container = False
 
-		def __init__(self, children=[]):
-			super(Conditional._Inside, self).__init__(children=children)
+		def __init__(self, slots, children=[]):
+			super(Conditional._Inside, self).__init__(children=children, slots=slots)
 
 		def generate(self):
 			from ..xml_parser import handleElement

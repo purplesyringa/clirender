@@ -1,11 +1,13 @@
-from node import Node
+from generator import Generator
 
 class NoDefault(object):
 	pass
 
 def fromXml(elem, slots, name, defines, container, additional_nodes):
-	class FromXml(Node):
+	class FromXml(Generator):
 		def __new__(cls, **attrs):
+			from ..xml_parser import handleElement
+
 			if cls.text_container:
 				attrs[""] = attrs["value"]
 				del attrs["value"]
@@ -13,11 +15,16 @@ def fromXml(elem, slots, name, defines, container, additional_nodes):
 				if len(attrs["children"]) > 1:
 					raise ValueError("Too many nodes in <%s>" % name)
 				elif len(attrs["children"]) == 1:
-					attrs[""] = attrs["children"][0]
+					rendered = handleElement(attrs["children"][0], defines=defines, slots=attrs["slots"], additional_nodes=additional_nodes)
+					if len(rendered) != 1:
+						raise ValueError("Rendered <Slot /> must contain exactly one node")
+
+					attrs[""] = rendered[0]
 					del attrs["children"]
 				else:
 					raise ValueError("Too less nodes in <%s>" % name)
 
+			del attrs["slots"]
 
 			cur_slots = dict(**slots)
 			for attr, value in attrs.items():
@@ -30,7 +37,6 @@ def fromXml(elem, slots, name, defines, container, additional_nodes):
 				if isinstance(slot, NoDefault):
 					raise ValueError("Required slot :%s not passed" % slot)
 
-			from ..xml_parser import handleElement
 			items = handleElement(elem, defines=defines, slots=cur_slots, additional_nodes=additional_nodes)
 			if len(items) != 1:
 				raise ValueError("<Define> must contain exactly one node")
