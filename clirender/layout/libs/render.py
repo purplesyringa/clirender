@@ -1,4 +1,9 @@
+from library import Library
+
 def getLibInfo(lib):
+	if isinstance(lib, type) and issubclass(lib, Library):
+		return lib
+
 	import all
 	if not hasattr(all, lib):
 		raise AttributeError("No %s lib" % lib)
