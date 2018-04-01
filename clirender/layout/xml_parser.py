@@ -53,6 +53,12 @@ def fromXml(code, additional_nodes={}):
 					raise ValueError("Defining special slot :%s" % name)
 
 				slots[name] = child.attrib.get("default", NoDefault)
+				if slots[name] is NoDefault:
+					slot = child.attrib.get(":default", NoDefault)
+					if slot is not NoDefault:
+						if slot != "__unset__":
+							raise ValueError("Deprecated: No slot except :__unset__ can be used for :default")
+						slots[name] = evaluate(slot, slots={})
 
 				if name == "":
 					if "container" not in child.attrib:
@@ -88,12 +94,13 @@ def handleElement(node, defines, slots, additional_nodes):
 		if name not in slots:
 			raise ValueError("Unknown slot :%s" % name)
 
-		if isinstance(slots[name], (str, unicode)):
+		value = evaluate(name, slots=slots)
+		if isinstance(value, (str, unicode)):
 			raise ValueError("Unexpected string slot :%s" % name)
-		elif slots[name] is NoDefault:
+		elif value is NoDefault:
 			raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
 
-		return [slots[name]]
+		return [value]
 
 	attrs = {}
 	inheritable = {}
@@ -101,10 +108,11 @@ def handleElement(node, defines, slots, additional_nodes):
 		if attr.startswith(":"):
 			attr = attr[1:]
 			try:
-				if slots[value] is NoDefault:
+				slot = evaluate(value, slots=slots)
+				if slot is NoDefault:
 					raise ValueError("Required slot :%s was not passed (from <%s>)" % (value, node.tag))
 
-				value = slots[value]
+				value = slot
 			except KeyError:
 				raise ValueError("Unknown slot :%s" % value)
 
@@ -186,10 +194,11 @@ def getTextInside(node, slots, allow_nodes=False):
 		elif item.tag == "Slot":
 			name = item.attrib.get("name", "")
 			if name in slots:
-				if slots[name] is NoDefault:
+				value = evaluate(name, slots=slots)
+				if value is NoDefault:
 					raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
-				elif isinstance(slots[name], (str, unicode)):
-					text += slots[name]
+				elif isinstance(value, (str, unicode)):
+					text += value
 				elif allow_nodes is None and had_nodes:
 					raise ValueError("Nodes and text inside <%s>" % node.tag)
 				elif allow_nodes is False:
@@ -205,3 +214,9 @@ def getTextInside(node, slots, allow_nodes=False):
 			had_nodes = True
 
 	return text
+
+def evaluate(name, slots):
+	if name in special_slots:
+		return special_slots[name]
+
+	return slots[name]
