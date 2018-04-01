@@ -2,7 +2,6 @@ from __future__ import division
 
 import numbers
 import re
-import numexpr
 from clirender.screen import Screen
 from exceptions import NoStretchError
 
@@ -56,7 +55,7 @@ class Layout(object):
 			if stretch is not None:
 				data["stretch"] = stretch
 
-			return numexpr.evaluate(size, local_dict={}, global_dict=data).item()
+			return eval(size, data)
 		except KeyError as e:
 			if e.args[0] == "stretch":
 				raise NoStretchError()

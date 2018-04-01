@@ -219,8 +219,6 @@ def evaluate(expr, slots):
 	if expr == "":
 		return slots[""]
 
-	import numexpr
-
 	all_slots = {"__builtins__": None}
 	all_slots.update(slots)
 	all_slots.update(special_slots)
