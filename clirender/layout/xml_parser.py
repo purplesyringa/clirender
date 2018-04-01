@@ -159,6 +159,7 @@ def handleElement(node, defines, slots, additional_nodes):
 
 	result.slots = slots
 	result.defines = defines
+	result.additional_nodes = additional_nodes
 	result.inheritable = inheritable
 	return [result]
 
@@ -172,8 +173,9 @@ def handleGenerator(node, defines, slots, ctor, attrs, inheritable, additional_n
 
 	node.slots = slots
 	node.defines = defines
+	node.additional_nodes = additional_nodes
 	node.inheritable = inheritable
-	return node.generate(additional_nodes=additional_nodes)
+	return node.generate()
 
 def getTextInside(node, slots, allow_nodes=False):
 	text = ""
