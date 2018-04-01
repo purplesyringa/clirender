@@ -39,7 +39,7 @@ class TabSwitch(Library):
 		def init(self, **kwargs):
 			TabSwitch.focusable.append(self)
 
-		def generate(self):
+		def onGenerate(self):
 			from ..xml_parser import handleElement
 
 			if len(self.children) != 1:

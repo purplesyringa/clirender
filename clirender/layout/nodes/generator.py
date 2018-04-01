@@ -13,6 +13,9 @@ class Generator(object):
 		pass
 
 	def generate(self):
+		return self.onGenerate()
+
+	def onGenerate(self):
 		raise NotImplementedError
 
 

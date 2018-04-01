@@ -12,7 +12,7 @@ class Range(Library):
 			self.step = step
 			self.slot = slot
 
-		def generate(self):
+		def onGenerate(self):
 			from ..xml_parser import handleElement
 
 			try:
