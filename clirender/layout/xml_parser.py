@@ -215,8 +215,14 @@ def getTextInside(node, slots, allow_nodes=False):
 
 	return text
 
-def evaluate(name, slots):
-	if name in special_slots:
-		return special_slots[name]
+def evaluate(expr, slots):
+	if expr == "":
+		return slots[""]
 
-	return slots[name]
+	import numexpr
+
+	all_slots = {"__builtins__": None}
+	all_slots.update(slots)
+	all_slots.update(special_slots)
+
+	return eval(expr, all_slots)
