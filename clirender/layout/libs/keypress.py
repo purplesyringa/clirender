@@ -27,13 +27,15 @@ def waitKey():
 class KeyPress(Library):
 	def beforeLoop(self, instances):
 		self.key = None
+		self.instances = instances
 
 	def loop(self, instances):
-		self.key = ord(waitKey())
+		if self.key is None:
+			self.key = ord(waitKey())
 		if self.key == 3:
 			raise KeyboardInterrupt
 
 	def getKey(self):
 		if self.key is None:
-			self.loop()
+			self.loop(self.instances)
 		return self.key
