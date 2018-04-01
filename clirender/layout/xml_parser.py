@@ -53,10 +53,6 @@ def fromXml(code, additional_nodes={}):
 					raise ValueError("Defining special slot :%s" % name)
 
 				slots[name] = child.attrib.get("default", NoDefault)
-				if slots[name] is NoDefault:
-					if ":default" in child.attrib:
-						slot_name = child.attrib[":default"]
-						slots[name] = slots.get(slot_name, special_slots.get(slot_name, NoDefault))
 
 				if name == "":
 					if "container" not in child.attrib:
