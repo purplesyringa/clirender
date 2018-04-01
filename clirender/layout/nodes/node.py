@@ -12,11 +12,15 @@ class Node(object):
 		self.inheritable = {}
 
 		self._children = children
+		self._cached_children = None
 		self.value = value
 
 	@property
 	def children(self):
-		return self._get_children(self._children)
+		if self._cached_children is None:
+			self._cached_children = self._get_children(self._children)
+
+		return self._cached_children
 
 	@children.setter
 	def children(self, children):
