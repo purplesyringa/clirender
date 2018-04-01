@@ -11,8 +11,28 @@ class Node(object):
 
 		self.inheritable = {}
 
-		self.children = children
+		self._children = children
 		self.value = value
+
+	@property
+	def children(self):
+		return self._get_children(self._children)
+
+	@children.setter
+	def children(self, children):
+		self._children = children
+
+	def _get_children(self, old):
+		from generator import Generator
+
+		children = []
+		for child in old:
+			if isinstance(child, Generator):
+				children += self._get_children(child.generate())
+			else:
+				children.append(child)
+
+		return children
 
 	def render(self, layout, dry_run=False):
 		raise NotImplementedError
