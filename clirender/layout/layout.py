@@ -10,8 +10,9 @@ class Layout(object):
 		self.screen = Screen()
 		self.root = root
 
-	def render(self):
-		self.screen.clear()
+	def render(self, clear=True):
+		if clear:
+			self.screen.clear()
 
 		self.root.render_offset = (0, 0)
 		self.root.render_boundary_left_top = [0, 0]

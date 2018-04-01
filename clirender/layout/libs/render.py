@@ -55,4 +55,4 @@ def render(layout, libs):
 				if hasattr(lib, "loop"):
 					lib.loop(lib_instances)
 
-			layout.render()
+			layout.render(clear=False)
