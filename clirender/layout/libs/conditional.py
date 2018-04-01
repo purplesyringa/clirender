@@ -16,7 +16,7 @@ class Conditional(Library):
 
 			self.is_ = is_
 
-		def generate(self, slots, defines, additional_nodes):
+		def generate(self, defines, additional_nodes):
 			from ..xml_parser import handleElement
 
 			result = self.evaluate()
@@ -25,10 +25,10 @@ class Conditional(Library):
 			for child in self.children:
 				if child.tag == "Then":
 					if result:
-						res += handleElement(child, defines, slots, additional_nodes)
+						res += handleElement(child, defines, self.slots, additional_nodes)
 				elif child.tag == "Else":
 					if not result:
-						res += handleElement(child, defines, slots, additional_nodes)
+						res += handleElement(child, defines, self.slots, additional_nodes)
 				else:
 					raise ValueError("Unexpected %s inside <If>" % child)
 
@@ -53,12 +53,12 @@ class Conditional(Library):
 		def __init__(self, children=[]):
 			super(Conditional._Inside, self).__init__(children=children)
 
-		def generate(self, slots, defines, additional_nodes):
+		def generate(self, defines, additional_nodes):
 			from ..xml_parser import handleElement
 
 			res = []
 			for child in self.children:
-				res += handleElement(child, defines, slots, additional_nodes)
+				res += handleElement(child, defines, self.slots, additional_nodes)
 
 			return res
 

@@ -10,7 +10,7 @@ special_slots = {
 NoDefault = nodes.NoDefault
 
 def gatherLibs(node):
-	if isinstance(node, str) or isinstance(node, unicode):
+	if isinstance(node, (str, unicode)):
 		parser = etree.XMLParser(recover=True)
 		node = etree.fromstring(node, parser=parser)
 
@@ -93,7 +93,7 @@ def handleElement(node, defines, slots, additional_nodes):
 		if name not in slots:
 			raise ValueError("Unknown slot :%s" % name)
 
-		if isinstance(slots[name], str) or isinstance(slots[name], unicode):
+		if isinstance(slots[name], (str, unicode)):
 			raise ValueError("Unexpected string slot :%s" % name)
 		elif slots[name] is NoDefault:
 			raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
@@ -157,6 +157,7 @@ def handleElement(node, defines, slots, additional_nodes):
 
 		result = ctor(**attrs)
 
+	result.slots = slots
 	result.inheritable = inheritable
 	return [result]
 
@@ -168,15 +169,16 @@ def handleGenerator(node, defines, slots, ctor, attrs, inheritable, additional_n
 	else:
 		node = ctor(**attrs)
 
+	node.slots = slots
 	node.inheritable = inheritable
-	return node.generate(slots, defines, additional_nodes=additional_nodes)
+	return node.generate(defines, additional_nodes=additional_nodes)
 
 def getTextInside(node, slots, allow_nodes=False):
 	text = ""
 	had_nodes = False
 
 	for item in node.xpath("child::node()"):
-		if isinstance(item, str) or isinstance(item, unicode):
+		if isinstance(item, (str, unicode)):
 			text += item
 
 			if allow_nodes is None and text.strip() != "" and had_nodes:
@@ -188,7 +190,7 @@ def getTextInside(node, slots, allow_nodes=False):
 			if name in slots:
 				if slots[name] is NoDefault:
 					raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
-				elif isinstance(slots[name], str) or isinstance(slots[name], unicode):
+				elif isinstance(slots[name], (str, unicode)):
 					text += slots[name]
 				elif allow_nodes is None and had_nodes:
 					raise ValueError("Nodes and text inside <%s>" % node.tag)

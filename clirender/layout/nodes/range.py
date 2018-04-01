@@ -13,7 +13,7 @@ class Range(Generator):
 		self.step = step
 		self.slot = slot
 
-	def generate(self, slots, defines, additional_nodes):
+	def generate(self, defines, additional_nodes):
 		from ..xml_parser import handleElement
 
 		try:
@@ -31,7 +31,7 @@ class Range(Generator):
 		except ValueError:
 			raise ValueError("'step' attribute of <Range> must be an integer")
 
-		new_slots = dict(**slots)
+		new_slots = dict(**self.slots)
 
 		res = []
 		for i in range(from_, to, step):
