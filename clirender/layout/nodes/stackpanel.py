@@ -13,7 +13,7 @@ class StackPanel(Rect):
 		self.hspacing = hspacing
 		self.wspacing = wspacing
 
-	def render(self, layout, dry_run=False):
+	def render(self, dry_run=False):
 		# Guess container size
 		if self.vertical:
 			stretch = self.width
@@ -22,7 +22,7 @@ class StackPanel(Rect):
 
 		if self.width is None or self.height is None:
 			# Let guessContainerSize() find out 'stretch' if it is not given
-			width, height, stretch = self.guessContainerSize(layout, stretch=stretch)
+			width, height, stretch = self.guessContainerSize(stretch=stretch)
 			if self.width is not None:
 				width = self.width
 			if self.height is not None:
@@ -31,19 +31,19 @@ class StackPanel(Rect):
 			# If the size is given, don't do unnecessary actions
 			width, height = self.width, self.height
 
-		x1, y1, x2, y2 = super(StackPanel, self).render(layout, dry_run=dry_run, width=width, height=height)
-		self.renderChildren(layout, x1, y1, x2, y2, dry_run=dry_run, stretch=stretch)
+		x1, y1, x2, y2 = super(StackPanel, self).render(dry_run=dry_run, width=width, height=height)
+		self.renderChildren(x1, y1, x2, y2, dry_run=dry_run, stretch=stretch)
 
 		return x1, y1, x2, y2
 
-	def guessContainerSize(self, layout, stretch=None):
-		x1, y1, x2, y2 = super(StackPanel, self).render(layout, dry_run=True, width=self.width or 0, height=self.height or 0)
+	def guessContainerSize(self, stretch=None):
+		x1, y1, x2, y2 = super(StackPanel, self).render(dry_run=True, width=self.width or 0, height=self.height or 0)
 
-		return self.renderChildren(layout, x1, y1, x2, y2, dry_run=True, stretch=stretch)
+		return self.renderChildren(x1, y1, x2, y2, dry_run=True, stretch=stretch)
 
-	def renderChildren(self, layout, x1, y1, x2, y2, dry_run=False, stretch=None):
-		wspacing = layout.calcRelativeSize(self.wspacing, self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
-		hspacing = layout.calcRelativeSize(self.hspacing, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1], self.render_stretch)
+	def renderChildren(self, x1, y1, x2, y2, dry_run=False, stretch=None):
+		wspacing = self.layout.calcRelativeSize(self.wspacing, self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
+		hspacing = self.layout.calcRelativeSize(self.hspacing, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1], self.render_stretch)
 
 		cur_x, cur_y = x1, y1
 		max_width, max_height = 0, 0
@@ -90,7 +90,7 @@ class StackPanel(Rect):
 
 			try:
 				child_x1, child_y1, child_x2, child_y2 = self.renderChild(
-					layout, child, dry_run=dry_run,
+					child, dry_run=dry_run,
 
 					offset=(cur_x, cur_y),
 					boundary_left_top=boundary_left_top,
@@ -116,7 +116,7 @@ class StackPanel(Rect):
 			else:
 				stretch = sum(rows_columns_no_stretch) + cur_x - x1
 
-			return self.renderChildren(layout, x1, y1, x2, y2, dry_run=dry_run, stretch=stretch)
+			return self.renderChildren(x1, y1, x2, y2, dry_run=dry_run, stretch=stretch)
 
 		if self.vertical:
 			rows_columns.append((max_width, cur_y - y1))

@@ -6,15 +6,13 @@ class Range(Library):
 		container = True
 		text_container = False
 
-		def __init__(self, slots, from_, to, step=1, slot=None, children=[]):
-			super(Range.Range, self).__init__(children=children, slots=slots)
-
+		def init(self, from_, to, step=1, slot=None):
 			self.from_ = from_
 			self.to = to
 			self.step = step
 			self.slot = slot
 
-		def generate(self):
+		def onGenerate(self):
 			from ..xml_parser import handleElement
 
 			try:

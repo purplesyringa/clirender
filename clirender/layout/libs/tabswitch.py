@@ -9,11 +9,12 @@ Conditional.add(handler)
 
 class TabSwitch(Library):
 	dependencies = ["KeyPress"]
-	focusable = []
-	focused_id = 0
 
 	def __init__(self, layout):
 		super(TabSwitch, self).__init__(layout)
+
+		self.focusable = []
+		self.focused_id = 0
 
 	def loop(self, instances):
 		key = instances["KeyPress"].getKey()
@@ -21,13 +22,13 @@ class TabSwitch(Library):
 			self.tab()
 
 	def tab(self):
-		old = TabSwitch.focusable[TabSwitch.focused_id]
+		old = self.focusable[self.focused_id]
 
-		TabSwitch.focused_id += 1
-		if TabSwitch.focused_id >= len(TabSwitch.focusable):
-			TabSwitch.focused_id = 0
+		self.focused_id += 1
+		if self.focused_id >= len(self.focusable):
+			self.focused_id = 0
 
-		new = TabSwitch.focusable[TabSwitch.focused_id]
+		new = self.focusable[self.focused_id]
 
 		old.revoke()
 		new.revoke()
@@ -36,16 +37,15 @@ class TabSwitch(Library):
 		container = True
 		text_container = False
 
-		def __init__(self, **kwargs):
-			super(TabSwitch.Focusable, self).__init__(**kwargs)
-			TabSwitch.focusable.append(self)
+		def init(self, **kwargs):
+			self.layout.libs["TabSwitch"].focusable.append(self)
 
-		def generate(self):
+		def onGenerate(self):
 			from ..xml_parser import handleElement
 
 			if len(self.children) != 1:
 				raise ValueError("<Focusable> can contain only one node")
 
 			slots = dict(**self.slots)
-			slots["focused"] = "True" if TabSwitch.focusable.index(self) == TabSwitch.focused_id else "False"
+			slots["focused"] = "True" if self.layout.libs["TabSwitch"].focusable.index(self) == self.layout.libs["TabSwitch"].focused_id else "False"
 			return handleElement(self.children[0], self.defines, slots, additional_nodes=self.additional_nodes)

@@ -7,5 +7,5 @@ class Switch(Node):
 	def __init__(self):
 		super(Switch, self).__init__()
 
-	def render(self, layout, dry_run=False):
+	def render(self, dry_run=False):
 		raise ValueError("<Switch> must be used inside <StackPanel> only")
