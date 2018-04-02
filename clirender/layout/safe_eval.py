@@ -1,8 +1,13 @@
 from asteval import Interpreter
 
 def safeEval(expr, scope):
+	scope = dict(**scope)
+	for name in scope:
+		if getattr(scope[name], "wrapped", False) is True:
+			scope[name] = scope[name](scope)
+
 	interpreter = Interpreter(
-		usersyms=dict(**scope),
+		usersyms=scope,
 		use_numpy=False,
 		minimal=False
 	)
