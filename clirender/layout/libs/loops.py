@@ -41,3 +41,31 @@ class Loops(Library):
 					res += handleElement(child, self.defines, dict(**new_slots), additional_nodes=self.additional_nodes)
 
 			return res
+
+	class For(Generator):
+		container = True
+		text_container = False
+
+		def init(self, in_, slot=None):
+			self.in_ = in_
+			self.slot = slot
+
+		def onGenerate(self):
+			from ..xml_parser import handleElement
+
+			try:
+				in_ = list(self.in_)
+			except ValueError:
+				raise ValueError("'in' attribute of <For> must be a list")
+
+			new_slots = dict(**self.slots)
+
+			res = []
+			for i in in_:
+				if self.slot is not None:
+					new_slots[self.slot] = str(i)
+
+				for child in self.children:
+					res += handleElement(child, self.defines, dict(**new_slots), additional_nodes=self.additional_nodes)
+
+			return res
