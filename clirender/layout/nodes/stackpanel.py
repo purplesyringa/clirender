@@ -111,10 +111,15 @@ class StackPanel(Rect):
 				boundary_left_top[1] = y1
 				boundary_right_bottom[1] = y2
 
+			if rerender == "this":
+				rerender = "maybe"
 			if rerender == "maybe":
-				rerender = True
-
-			if not rerender and child._revoked:
+				if hasattr(child, "_render_cache"):
+					# Maybe the position wasn't changed, and we don't have to
+					# rerender completely?
+					if child._render_cache[:2] != (cur_x, cur_y):
+						rerender = "this"
+			elif child._revoked:
 				rerender = "maybe"
 
 			try:
@@ -126,7 +131,7 @@ class StackPanel(Rect):
 					boundary_right_bottom=boundary_right_bottom,
 					stretch = stretch,
 
-					completely_revoked=rerender is True
+					completely_revoked=(rerender is True or rerender == "this")
 				)
 			except NoStretchError:
 				row_column_has_stretch_problems = True
