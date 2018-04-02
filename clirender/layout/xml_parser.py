@@ -214,18 +214,13 @@ def getTextInside(node, slots, global_slots, allow_nodes=False):
 			pass
 		elif item.tag == "Slot":
 			name = item.attrib.get("name", "")
-			if name in slots:
-				value = evaluate(name, slots=slots, global_slots=global_slots)
-				if value is NoDefault:
-					raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
-				elif isinstance(value, (str, unicode)):
-					text += value
-				elif allow_nodes is None and had_nodes:
-					raise ValueError("Nodes and text inside <%s>" % node.tag)
-				elif allow_nodes is False:
-					raise ValueError("Nodes inside <%s>" % node.tag)
-			else:
-				raise ValueError("Unknown slot :%s" % name)
+			value = evaluate(name, slots=slots, global_slots=global_slots)
+			if isinstance(value, (str, unicode)):
+				text += value
+			elif allow_nodes is None and had_nodes:
+				raise ValueError("Nodes and text inside <%s>" % node.tag)
+			elif allow_nodes is False:
+				raise ValueError("Nodes inside <%s>" % node.tag)
 		else:
 			if allow_nodes is None and text.strip() != "":
 				raise ValueError("Nodes and text inside <%s>" % node.tag)
