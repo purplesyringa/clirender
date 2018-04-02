@@ -15,7 +15,9 @@ def gatherLibs(node):
 			libs.append(node.attrib["lib"])
 	return libs
 
-def fromXml(code, additional_nodes={}, global_slots={"__unset__": None}):
+def fromXml(code, additional_nodes={}, global_slots={}):
+	global_slots["__unset__"] = None
+
 	parser = etree.XMLParser(recover=True)
 	root = etree.fromstring(code, parser=parser)
 
