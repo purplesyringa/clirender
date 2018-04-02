@@ -13,7 +13,7 @@ setup(
 	version = "0.24",
 	description = "CLI rendering engine for Python",
 	long_description = readme,
-	install_requires = ["colorama", "lxml"],
+	install_requires = ["colorama", "lxml", "asteval"],
 	packages = find_packages(),
 	author = "Ivanq",
 	author_email = "imachug@gmail.com",
