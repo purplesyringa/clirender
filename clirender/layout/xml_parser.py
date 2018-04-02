@@ -127,14 +127,7 @@ def handleElement(node, defines, slots, additional_nodes, global_slots):
 			value = evaluatable(attr, value, global_slots=global_slots)
 		elif attr.startswith(":"):
 			attr = attr[1:]
-			try:
-				slot = evaluate(value, slots=slots, global_slots=global_slots)
-				if slot is NoDefault:
-					raise ValueError("Required slot :%s was not passed (from <%s>)" % (value, node.tag))
-
-				value = slot
-			except KeyError:
-				raise ValueError("Unknown slot :%s" % value)
+			value = evaluate(value, slots=slots, global_slots=global_slots)
 
 		if attr.startswith("inherit-"):
 			attr = attr[len("inherit-"):]
