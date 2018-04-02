@@ -37,7 +37,7 @@ class Loops(Library):
 			res = []
 			for i in range(from_, to, step):
 				if self.slot is not None:
-					new_slots[self.slot] = str(i)
+					new_slots[self.slot] = i
 
 				for child in self.children:
 					res += handleElement(child, self.defines, dict(**new_slots), additional_nodes=self.additional_nodes, global_slots=self.global_slots)
@@ -65,7 +65,7 @@ class Loops(Library):
 			res = []
 			for i in in_:
 				if self.slot is not None:
-					new_slots[self.slot] = str(i)
+					new_slots[self.slot] = i
 
 				for child in self.children:
 					res += handleElement(child, self.defines, dict(**new_slots), additional_nodes=self.additional_nodes, global_slots=self.global_slots)
