@@ -21,6 +21,7 @@ def fromXml(code, additional_nodes={}, global_slots={}):
 	parser = etree.XMLParser(recover=True)
 	root = etree.fromstring(code, parser=parser)
 
+	# Handle <Define>
 	define_nodes = root.findall("Define")
 
 	for node in define_nodes:
@@ -77,10 +78,24 @@ def fromXml(code, additional_nodes={}, global_slots={}):
 
 		defines[node.attrib["name"]] = nodes.fromXml(elem=children[0], slots=slots, defines=defines, name=node.attrib["name"], container=container, additional_nodes=additional_nodes, global_slots=global_slots)
 
+	# Handle <Global>
+	global_nodes = root.findall("Global")
+	additional_global_slots = {}
+	for node in global_nodes:
+		for name, value in node.attrib.items():
+			# Set name=value
+			if name.startswith(":"):
+				name = name[1:]
+				value = evaluate(value, slots={}, global_slots=global_slots)
+
+			additional_global_slots[name] = value
+
+	global_slots.update(additional_global_slots)
+
 	return handleElement(root, defines, slots={}, additional_nodes=additional_nodes, global_slots=global_slots)[0]
 
 def handleElement(node, defines, slots, additional_nodes, global_slots):
-	if node.tag in ["Define", "Use"]:
+	if node.tag in ["Define", "Use", "Global"]:
 		return []
 	elif node.tag is etree.Comment:
 		return []
