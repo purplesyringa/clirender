@@ -209,7 +209,7 @@ def getTextInside(node, slots, global_slots, allow_nodes=False):
 			name = item.attrib.get("name", "")
 			value = evaluate(name, slots=slots, global_slots=global_slots)
 			if not isinstance(value, (nodes.Node, nodes.Generator)):
-				text += value
+				text += str(value)
 			elif allow_nodes is None and had_nodes:
 				raise ValueError("Nodes and text inside <%s>" % node.tag)
 			elif allow_nodes is False:
