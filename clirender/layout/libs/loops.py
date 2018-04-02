@@ -1,7 +1,7 @@
 from library import Library
 from ..nodes import Generator, Container
 
-class Range(Library):
+class Loops(Library):
 	class Range(Generator):
 		container = True
 		text_container = False
