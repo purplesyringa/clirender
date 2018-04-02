@@ -33,6 +33,20 @@ def getAdditionalNodes(libs):
 
 	return nodes
 
+def getAdditionalSlots(libs):
+	slots = {}
+	for lib in getDependencies(libs):
+		info = getLibInfo(lib)
+
+		for obj in dir(info):
+			try:
+				if hasattr(getattr(info, obj), "slot"):
+					slots[getattr(info, obj).slot] = getattr(info, obj).__func__
+			except TypeError, e:
+				pass
+
+	return slots
+
 def register(name, lib):
 	setattr(all, name, lib)
 
