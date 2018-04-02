@@ -111,9 +111,6 @@ def handleElement(node, defines, slots, additional_nodes, global_slots):
 			return []
 
 		name = node.attrib.get("name", "")
-		if name not in slots:
-			raise ValueError("Unknown slot :%s" % name)
-
 		value = evaluate(name, slots=slots, global_slots=global_slots)
 		if isinstance(value, (str, unicode)):
 			raise ValueError("Unexpected string slot :%s" % name)
