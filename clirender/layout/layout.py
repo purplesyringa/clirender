@@ -10,7 +10,7 @@ class Layout(object):
 		self.screen = Screen()
 		self.root = root
 
-	def render(self, clear=True):
+	def render(self, force=False, clear=True):
 		if clear:
 			self.screen.clear()
 
@@ -19,6 +19,7 @@ class Layout(object):
 		self.root.render_boundary_right_bottom = list(self.screen.terminal_size)
 		self.root.parent = None
 		self.root.render_stretch = self.screen.terminal_size[0]
+		self.root._completely_revoked = force
 
 		self.root.layout = self
 		self.root.render()

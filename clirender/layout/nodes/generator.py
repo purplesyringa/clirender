@@ -25,3 +25,8 @@ class Generator(object):
 
 	def revoke(self):
 		self._cached = None
+
+		node = self.parent
+		while node is not None:
+			node._revoked = True
+			node = node.parent

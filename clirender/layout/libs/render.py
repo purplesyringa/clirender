@@ -44,7 +44,7 @@ def render(layout, libs):
 		lib_instances[lib] = getLibInfo(lib)(layout)
 
 	layout.libs = lib_instances
-	layout.render()
+	layout.render(force=True)
 
 	if any(hasattr(lib, "loop") for lib in lib_instances.values()):
 		while True:

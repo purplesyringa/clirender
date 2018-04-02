@@ -13,6 +13,8 @@ class Node(object):
 
 		self._children = children
 		self.value = value
+		self._revoked = False
+		self._completely_revoked = False
 
 	@property
 	def children(self):
@@ -82,12 +84,13 @@ class Node(object):
 		return value
 
 
-	def renderChild(self, child, dry_run, offset, boundary_left_top, boundary_right_bottom, stretch):
+	def renderChild(self, child, dry_run, offset, boundary_left_top, boundary_right_bottom, stretch, completely_revoked=True):
 		child.render_offset = offset
 		child.render_boundary_left_top = boundary_left_top
 		child.render_boundary_right_bottom = boundary_right_bottom
 		child.render_stretch = stretch
 		child.parent = self
 		child.layout = self.layout
+		child._completely_revoked = completely_revoked
 
 		return child.render(dry_run=dry_run)
