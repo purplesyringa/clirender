@@ -121,7 +121,7 @@ def handleElement(node, defines, slots, additional_nodes):
 			inheritable[attr] = value
 		else:
 			# Escape keywods
-			if attr in ("from", "is", "with", "else"):
+			if attr in ("from", "is", "with", "else", "in"):
 				attr += "_"
 
 			attrs[attr] = value
