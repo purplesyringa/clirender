@@ -17,6 +17,12 @@ class TabSwitch(Library):
 			self.tab()
 
 	def tab(self):
+		if self.focusable >= len(self.focusable):
+			self.focusable = 0
+
+		if self.focusable >= len(self.focusable):
+			return
+
 		old = self.focusable[self.focused_id]
 
 		self.focused_id += 1
