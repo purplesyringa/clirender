@@ -47,10 +47,10 @@ class Conditional(Library):
 				for child in self.children:
 					if child.tag == "Then":
 						if result:
-							res += handleElement(child, self.defines, self.slots, self.additional_nodes)
+							res += handleElement(child, self.defines, self.slots, self.additional_nodes, global_slots=self.global_slots)
 					elif child.tag == "Else":
 						if not result:
-							res += handleElement(child, self.defines, self.slots, self.additional_nodes)
+							res += handleElement(child, self.defines, self.slots, self.additional_nodes, global_slots=self.global_slots)
 					else:
 						raise ValueError("Unexpected %s inside <If>" % child)
 			else:
@@ -69,7 +69,7 @@ class Conditional(Library):
 					if child.tag == ("Then", "Else"):
 						raise ValueError("Unexpected %s inside <If with>" % child)
 
-					res += handleElement(child, self.defines, slots, self.additional_nodes)
+					res += handleElement(child, self.defines, slots, self.additional_nodes, global_slots=self.global_slots)
 
 			return res
 
@@ -86,7 +86,7 @@ class Conditional(Library):
 
 			res = []
 			for child in self.children:
-				res += handleElement(child, self.defines, self.slots, self.additional_nodes)
+				res += handleElement(child, self.defines, self.slots, self.additional_nodes, global_slots=self.global_slots)
 
 			return res
 

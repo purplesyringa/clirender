@@ -3,7 +3,7 @@ from generator import Generator
 class NoDefault(object):
 	pass
 
-def fromXml(elem, slots, name, defines, container, additional_nodes):
+def fromXml(elem, slots, name, defines, container, additional_nodes, global_slots):
 	class FromXml(Generator):
 		def __new__(cls, **attrs):
 			from ..xml_parser import handleElement
@@ -15,7 +15,7 @@ def fromXml(elem, slots, name, defines, container, additional_nodes):
 				if len(attrs["children"]) > 1:
 					raise ValueError("Too many nodes in <%s>" % name)
 				elif len(attrs["children"]) == 1:
-					rendered = handleElement(attrs["children"][0], defines=defines, slots=attrs["slots"], additional_nodes=additional_nodes)
+					rendered = handleElement(attrs["children"][0], defines=defines, slots=attrs["slots"], additional_nodes=additional_nodes, global_slots=global_slots)
 					if len(rendered) != 1:
 						raise ValueError("Rendered <Slot /> must contain exactly one node")
 
@@ -37,7 +37,7 @@ def fromXml(elem, slots, name, defines, container, additional_nodes):
 				if isinstance(slot, NoDefault):
 					raise ValueError("Required slot :%s not passed" % slot)
 
-			items = handleElement(elem, defines=defines, slots=cur_slots, additional_nodes=additional_nodes)
+			items = handleElement(elem, defines=defines, slots=cur_slots, additional_nodes=additional_nodes, global_slots=global_slots)
 			if len(items) != 1:
 				raise ValueError("<Define> must contain exactly one node")
 			return items[0]

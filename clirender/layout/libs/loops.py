@@ -38,7 +38,7 @@ class Loops(Library):
 					new_slots[self.slot] = str(i)
 
 				for child in self.children:
-					res += handleElement(child, self.defines, dict(**new_slots), additional_nodes=self.additional_nodes)
+					res += handleElement(child, self.defines, dict(**new_slots), additional_nodes=self.additional_nodes, global_slots=self.global_slots)
 
 			return res
 
@@ -66,6 +66,6 @@ class Loops(Library):
 					new_slots[self.slot] = str(i)
 
 				for child in self.children:
-					res += handleElement(child, self.defines, dict(**new_slots), additional_nodes=self.additional_nodes)
+					res += handleElement(child, self.defines, dict(**new_slots), additional_nodes=self.additional_nodes, global_slots=self.global_slots)
 
 			return res

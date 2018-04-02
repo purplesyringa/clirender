@@ -43,4 +43,4 @@ class TabSwitch(Library):
 
 			slots = dict(**self.slots)
 			slots["focused"] = "True" if self.layout.libs["TabSwitch"].focusable.index(self) == self.layout.libs["TabSwitch"].focused_id else "False"
-			return handleElement(self.children[0], self.defines, slots, additional_nodes=self.additional_nodes)
+			return handleElement(self.children[0], self.defines, slots, additional_nodes=self.additional_nodes, global_slots=self.global_slots)

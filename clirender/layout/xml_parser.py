@@ -2,10 +2,6 @@ from lxml import etree
 
 import nodes
 
-special_slots = {
-	"__unset__": None
-}
-
 NoDefault = nodes.NoDefault
 
 def gatherLibs(node):
@@ -19,7 +15,7 @@ def gatherLibs(node):
 			libs.append(node.attrib["lib"])
 	return libs
 
-def fromXml(code, additional_nodes={}):
+def fromXml(code, additional_nodes={}, global_slots={"__unset__": None}):
 	parser = etree.XMLParser(recover=True)
 	root = etree.fromstring(code, parser=parser)
 
@@ -49,7 +45,7 @@ def fromXml(code, additional_nodes={}):
 		for child in children:
 			if child.tag == "Slot" and "define" in child.attrib:
 				name = child.attrib["define"]
-				if name in special_slots:
+				if name in global_slots:
 					raise ValueError("Defining special slot :%s" % name)
 
 				slots[name] = child.attrib.get("default", NoDefault)
@@ -58,7 +54,7 @@ def fromXml(code, additional_nodes={}):
 					if slot is not NoDefault:
 						if slot != "__unset__":
 							raise ValueError("Deprecated: No slot except :__unset__ can be used for :default")
-						slots[name] = evaluate(slot, slots={})
+						slots[name] = evaluate(slot, slots={}, global_slots=global_slots)
 
 				if name == "":
 					if "container" not in child.attrib:
@@ -77,11 +73,11 @@ def fromXml(code, additional_nodes={}):
 		if children[0].tag == "Range":
 			raise ValueError("<Define> must have exactly one child: cannot guarantee that <Range> is always one child")
 
-		defines[node.attrib["name"]] = nodes.fromXml(elem=children[0], slots=slots, defines=defines, name=node.attrib["name"], container=container, additional_nodes=additional_nodes)
+		defines[node.attrib["name"]] = nodes.fromXml(elem=children[0], slots=slots, defines=defines, name=node.attrib["name"], container=container, additional_nodes=additional_nodes, global_slots=global_slots)
 
-	return handleElement(root, defines, slots={}, additional_nodes=additional_nodes)[0]
+	return handleElement(root, defines, slots={}, additional_nodes=additional_nodes, global_slots=global_slots)[0]
 
-def handleElement(node, defines, slots, additional_nodes):
+def handleElement(node, defines, slots, additional_nodes, global_slots):
 	if node.tag in ["Define", "Use"]:
 		return []
 	elif node.tag is etree.Comment:
@@ -94,7 +90,7 @@ def handleElement(node, defines, slots, additional_nodes):
 		if name not in slots:
 			raise ValueError("Unknown slot :%s" % name)
 
-		value = evaluate(name, slots=slots)
+		value = evaluate(name, slots=slots, global_slots=global_slots)
 		if isinstance(value, (str, unicode)):
 			raise ValueError("Unexpected string slot :%s" % name)
 		elif value is NoDefault:
@@ -108,7 +104,7 @@ def handleElement(node, defines, slots, additional_nodes):
 		if attr.startswith(":"):
 			attr = attr[1:]
 			try:
-				slot = evaluate(value, slots=slots)
+				slot = evaluate(value, slots=slots, global_slots=global_slots)
 				if slot is NoDefault:
 					raise ValueError("Required slot :%s was not passed (from <%s>)" % (value, node.tag))
 
@@ -135,21 +131,21 @@ def handleElement(node, defines, slots, additional_nodes):
 		raise ValueError("Unknown node <%s>" % node.tag)
 
 	if issubclass(ctor, nodes.Generator):
-		return handleGenerator(node, defines, slots, ctor=ctor, attrs=attrs, inheritable=inheritable, additional_nodes=additional_nodes)
+		return handleGenerator(node, defines, slots, ctor=ctor, attrs=attrs, inheritable=inheritable, additional_nodes=additional_nodes, global_slots=global_slots)
 
 	result = None
 	if ctor.text_container:
-		text_inside = getTextInside(node, slots=slots)
+		text_inside = getTextInside(node, slots=slots, global_slots=global_slots)
 
 		result = ctor(value=text_inside, **attrs)
 	elif ctor.container:
-		text_inside = getTextInside(node, slots=slots, allow_nodes=True)
+		text_inside = getTextInside(node, slots=slots, global_slots=global_slots, allow_nodes=True)
 		if text_inside.strip() != "":
 			raise ValueError("Text inside <%s>" % node.tag)
 
 		children = []
 		for child in node:
-			children += handleElement(child, defines, slots, additional_nodes=additional_nodes)
+			children += handleElement(child, defines, slots, additional_nodes=additional_nodes, global_slots=global_slots)
 
 		result = ctor(children=children, **attrs)
 	else:
@@ -166,9 +162,9 @@ def handleElement(node, defines, slots, additional_nodes):
 	result.inheritable = inheritable
 	return [result]
 
-def handleGenerator(node, defines, slots, ctor, attrs, inheritable, additional_nodes):
+def handleGenerator(node, defines, slots, ctor, attrs, inheritable, additional_nodes, global_slots):
 	if ctor.text_container:
-		node = ctor(value=getTextInside(node, slots, allow_nodes=False), slots=slots, **attrs)
+		node = ctor(value=getTextInside(node, slots, global_slots=global_slots, allow_nodes=False), slots=slots, **attrs)
 	elif ctor.container:
 		node = ctor(children=list(node), slots=slots, **attrs)
 	else:
@@ -176,10 +172,11 @@ def handleGenerator(node, defines, slots, ctor, attrs, inheritable, additional_n
 
 	node.defines = defines
 	node.additional_nodes = additional_nodes
+	node.global_slots = global_slots
 	node.inheritable = inheritable
 	return [node]
 
-def getTextInside(node, slots, allow_nodes=False):
+def getTextInside(node, slots, global_slots, allow_nodes=False):
 	text = ""
 	had_nodes = False
 
@@ -194,7 +191,7 @@ def getTextInside(node, slots, allow_nodes=False):
 		elif item.tag == "Slot":
 			name = item.attrib.get("name", "")
 			if name in slots:
-				value = evaluate(name, slots=slots)
+				value = evaluate(name, slots=slots, global_slots=global_slots)
 				if value is NoDefault:
 					raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
 				elif isinstance(value, (str, unicode)):
@@ -215,13 +212,13 @@ def getTextInside(node, slots, allow_nodes=False):
 
 	return text
 
-def evaluate(expr, slots):
+def evaluate(expr, slots, global_slots):
 	if expr == "":
 		return slots[""]
 
 	all_slots = {}
 	all_slots.update(slots)
-	all_slots.update(special_slots)
+	all_slots.update(global_slots)
 
 	from safe_eval import safeEval
 	return safeEval(expr, all_slots)
