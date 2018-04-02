@@ -58,6 +58,10 @@ def fromXml(code, additional_nodes={}, global_slots={}):
 						if slot != "__unset__":
 							raise ValueError("Deprecated: No slot except :__unset__ can be used for :default")
 						slots[name] = evaluate(slot, slots={}, global_slots=global_slots)
+					else:
+						slot = child.attrib.get("::default", NoDefault)
+						if slot is not NoDefault:
+							slots[name] = evaluatable("default", slot, global_slots=global_slots)
 
 				if name == "":
 					if "container" not in child.attrib:
