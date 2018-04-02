@@ -112,8 +112,8 @@ def handleElement(node, defines, slots, additional_nodes, global_slots):
 
 		name = node.attrib.get("name", "")
 		value = evaluate(name, slots=slots, global_slots=global_slots)
-		if isinstance(value, (str, unicode)):
-			raise ValueError("Unexpected string slot :%s" % name)
+		if not isinstance(value, (nodes.Node, nodes.Generator)):
+			raise ValueError("Unexpected %s slot :%s" % (type(value), name))
 		elif value is NoDefault:
 			raise ValueError("Required slot :%s was not passed (from <%s>)" % (name, node.tag))
 
@@ -208,7 +208,7 @@ def getTextInside(node, slots, global_slots, allow_nodes=False):
 		elif item.tag == "Slot":
 			name = item.attrib.get("name", "")
 			value = evaluate(name, slots=slots, global_slots=global_slots)
-			if isinstance(value, (str, unicode)):
+			if not isinstance(value, (nodes.Node, nodes.Generator)):
 				text += value
 			elif allow_nodes is None and had_nodes:
 				raise ValueError("Nodes and text inside <%s>" % node.tag)
