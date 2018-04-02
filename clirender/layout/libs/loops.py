@@ -30,6 +30,8 @@ class Loops(Library):
 			except ValueError:
 				raise ValueError("'step' attribute of <Range> must be an integer")
 
+			to += step
+
 			new_slots = dict(**self.slots)
 
 			res = []
