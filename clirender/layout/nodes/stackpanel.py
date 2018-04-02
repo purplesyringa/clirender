@@ -114,12 +114,8 @@ class StackPanel(Rect):
 			if rerender == "maybe":
 				rerender = True
 
-			if rerender:
-				child._revoked = False
-			elif child._revoked:
+			if not rerender and child._revoked:
 				rerender = "maybe"
-			elif not rerender:
-				child._revoked = False
 
 			try:
 				child_x1, child_y1, child_x2, child_y2 = self.renderChild(
