@@ -25,9 +25,9 @@ class Text(Node):
 		x2, y2 = self.render_offset[0] + width, self.render_offset[1] + 1
 		x2, y2 = map(min, zip((x2, y2), self.render_boundary_right_bottom))
 
-		if not (self.render_boundary_left_top[0] <= x1 <= x2 < self.render_boundary_right_bottom[0]):
+		if not (self.render_boundary_left_top[0] <= x1 <= x2 <= self.render_boundary_right_bottom[0]):
 			return x1, y1, x2, y2
-		elif not (self.render_boundary_left_top[1] <= y1 <= y2 < self.render_boundary_right_bottom[1]):
+		elif not (self.render_boundary_left_top[1] <= y1 <= y2 <= self.render_boundary_right_bottom[1]):
 			return x1, y1, x2, y2
 
 		bg = self.inherit("bg")
