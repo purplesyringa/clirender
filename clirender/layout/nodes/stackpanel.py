@@ -6,19 +6,21 @@ class StackPanel(Rect):
 	container = True
 	text_container = False
 
-	def __init__(self, width=None, height=None, bg=None, orientation="horizontal", hspacing=0, wspacing=0, children=[]):
+	def __init__(self, width=None, height=None, bg=None, orientation="horizontal", hspacing=0, wspacing=0, optimize="safe", children=[]):
 		super(StackPanel, self).__init__(width=width, height=height, bg=bg, children=children)
 
 		self.vertical = orientation.lower() == "vertical"
 		self.hspacing = hspacing
 		self.wspacing = wspacing
+		self.optimize = optimize
 
 		self._render_cache = None
 
 	def render(self, dry_run=False):
-		if not (self._completely_revoked or self._revoked) and self._render_cache:
-			# Nothing was changed since last render
-			return self._render_cache
+		if self.optimize != "no":
+			if not (self._completely_revoked or self._revoked) and self._render_cache:
+				# Nothing was changed since last render
+				return self._render_cache
 
 
 		# Guess container size
@@ -63,6 +65,9 @@ class StackPanel(Rect):
 			# some child was changed
 			rerender = False
 		else:
+			rerender = True
+
+		if self.optimize == "no":
 			rerender = True
 
 		wspacing = self.layout.calcRelativeSize(self.wspacing, self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
@@ -111,16 +116,17 @@ class StackPanel(Rect):
 				boundary_left_top[1] = y1
 				boundary_right_bottom[1] = y2
 
-			if rerender == "this":
-				rerender = "maybe"
-			if rerender == "maybe":
-				if hasattr(child, "_render_cache"):
-					# Maybe the position wasn't changed, and we don't have to
-					# rerender completely?
-					if child._render_cache[:2] != (cur_x, cur_y):
-						rerender = "this"
-			elif child._revoked:
-				rerender = "maybe"
+			if self.optimize == "aggressive":
+				if rerender == "this":
+					rerender = "maybe"
+				if rerender == "maybe":
+					if hasattr(child, "_render_cache"):
+						# Maybe the position wasn't changed, and we don't have to
+						# rerender completely?
+						if child._render_cache[:2] != (cur_x, cur_y):
+							rerender = "this"
+				elif child._revoked:
+					rerender = "maybe"
 
 			try:
 				child_x1, child_y1, child_x2, child_y2 = self.renderChild(
