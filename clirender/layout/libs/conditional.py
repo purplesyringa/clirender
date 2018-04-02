@@ -1,5 +1,6 @@
 from library import Library
 from ..nodes import Generator
+from ..safe_eval import safeEval
 
 class Conditional(Library):
 	def __init__(self, layout):
@@ -78,7 +79,7 @@ class Conditional(Library):
 				scope.update(handler(self))
 
 			try:
-				value = eval(self.is_, scope)
+				value = safeEval(self.is_, scope)
 			except KeyError, e:
 				raise ValueError("Unknown variable used in conditional: %s" % e[0])
 			return bool(value)

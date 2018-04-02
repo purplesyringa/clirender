@@ -4,6 +4,7 @@ import numbers
 import re
 from clirender.screen import Screen
 from exceptions import NoStretchError
+from safe_eval import safeEval
 
 class Layout(object):
 	def __init__(self, root):
@@ -57,7 +58,7 @@ class Layout(object):
 			if stretch is not None:
 				data["stretch"] = stretch
 
-			return eval(size, data)
+			return safeEval(size, data)
 		except KeyError as e:
 			if e.args[0] == "stretch":
 				raise NoStretchError()
