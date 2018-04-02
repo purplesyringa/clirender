@@ -1,5 +1,6 @@
 from screen import *
 from layout import *
+from layout.libs import register
 
 def easyRender(xml):
 	from layout.xml_parser import gatherLibs, fromXml
