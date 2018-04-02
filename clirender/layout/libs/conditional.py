@@ -74,15 +74,7 @@ class Conditional(Library):
 			return res
 
 		def evaluate(self):
-			scope = {}
-			for handler in Conditional.handlers:
-				scope.update(handler(self))
-
-			try:
-				value = safeEval(self.is_, scope)
-			except KeyError, e:
-				raise ValueError("Unknown variable used in conditional: %s" % e[0])
-			return bool(value)
+			return bool(self.is_) and self.is_ != "False"
 
 
 	class _Inside(Generator):
@@ -102,9 +94,3 @@ class Conditional(Library):
 		pass
 	class Else(_Inside):
 		pass
-
-
-	handlers = []
-	@staticmethod
-	def add(handler):
-		Conditional.handlers.append(handler)

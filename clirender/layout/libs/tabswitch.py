@@ -2,11 +2,6 @@ from library import Library
 from ..nodes import Generator
 from conditional import Conditional
 
-def handler(node):
-	return dict(focused=True)
-
-Conditional.add(handler)
-
 class TabSwitch(Library):
 	dependencies = ["KeyPress"]
 
