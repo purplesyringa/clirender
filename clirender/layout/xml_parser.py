@@ -84,7 +84,10 @@ def fromXml(code, additional_nodes={}, global_slots={}):
 	for node in global_nodes:
 		for name, value in node.attrib.items():
 			# Set name=value
-			if name.startswith(":"):
+			if name.startswith("::"):
+				name = name[2:]
+				value = evaluatable(name, value, global_slots=global_slots)
+			elif name.startswith(":"):
 				name = name[1:]
 				value = evaluate(value, slots={}, global_slots=global_slots)
 
@@ -118,7 +121,10 @@ def handleElement(node, defines, slots, additional_nodes, global_slots):
 	attrs = {}
 	inheritable = {}
 	for attr, value in node.attrib.items():
-		if attr.startswith(":"):
+		if attr.startswith("::"):
+			attr = attr[2:]
+			value = evaluatable(attr, value, global_slots=global_slots)
+		elif attr.startswith(":"):
 			attr = attr[1:]
 			try:
 				slot = evaluate(value, slots=slots, global_slots=global_slots)
@@ -228,6 +234,16 @@ def getTextInside(node, slots, global_slots, allow_nodes=False):
 			had_nodes = True
 
 	return text
+
+
+def evaluatable(name, expr, global_slots):
+	def func():
+		try:
+			return evaluate(expr, slots={}, global_slots=global_slots)
+		except Exception, e:
+			raise ValueError("Could not evaluate ::%s: %s" % (name, e))
+
+	return func
 
 def evaluate(expr, slots, global_slots):
 	if expr == "":
