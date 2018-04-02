@@ -57,7 +57,8 @@ class Layout(object):
 			if stretch is not None:
 				data["stretch"] = stretch
 
-			return eval(size, data)
+			from safe_eval import safeEval
+			return safeEval(size, data)
 		except KeyError as e:
 			if e.args[0] == "stretch":
 				raise NoStretchError()

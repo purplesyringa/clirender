@@ -219,8 +219,9 @@ def evaluate(expr, slots):
 	if expr == "":
 		return slots[""]
 
-	all_slots = {"__builtins__": None}
+	all_slots = {}
 	all_slots.update(slots)
 	all_slots.update(special_slots)
 
-	return eval(expr, all_slots)
+	from safe_eval import safeEval
+	return safeEval(expr, all_slots)

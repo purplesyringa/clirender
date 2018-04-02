@@ -78,7 +78,8 @@ class Conditional(Library):
 				scope.update(handler(self))
 
 			try:
-				value = eval(self.is_, scope)
+				from safe_eval import safeEval
+				value = safeEval(self.is_, scope)
 			except KeyError, e:
 				raise ValueError("Unknown variable used in conditional: %s" % e[0])
 			return bool(value)
