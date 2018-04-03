@@ -106,7 +106,7 @@ class Node(object):
 		return sizes
 
 
-	def getBoundaryRect(self):
+	def getBoundaryBox(self):
 		return dict(
 			left=child.cache_offset[0],
 			top=child.cache_offset[0],
