@@ -1,7 +1,9 @@
+from nodes import Node
+
 class NodeAPI(object):
 	def getBoundingBox(self):
 		node = storage[self]
-		if hasattr(node, "getBoundingBox"):
+		if isinstance(node, Node):
 			return node.getBoundingBox()
 		else:
 			raise ValueError("getBoundingBox(): Not defined on %s" % type(node))
