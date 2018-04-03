@@ -1,6 +1,5 @@
 from library import Library
 from ..nodes import Generator
-from ..safe_eval import safeEval
 
 class Conditional(Library):
 	def __init__(self, layout):
