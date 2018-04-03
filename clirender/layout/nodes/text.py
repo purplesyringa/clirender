@@ -24,9 +24,9 @@ class Text(Node):
 		x2, y2 = x1 + width, y1 + 1
 
 		if not (self.render_boundary_left_top[0] <= x1 <= x2 <= self.render_boundary_right_bottom[0]):
-			return x1, y1, x2, y2
+			return x2, y2
 		elif not (self.render_boundary_left_top[1] <= y1 < y2 <= self.render_boundary_right_bottom[1]):
-			return x1, y1, x2, y2
+			return x2, y2
 
 		bg = self.inherit("bg")
 		color = self.inherit("color")
@@ -40,4 +40,4 @@ class Text(Node):
 					self.layout.screen.printAt(self.layout.screen.colorize(self.value, bg=bg, fg=color, bright=self.bright), x1, y1)
 					self.layout.screen.printAt(self.layout.screen.colorize(" " * int(width - len(self.value)), bg=bg), x1 + len(self.value), y1)
 
-		return x1, y1, x2, y2
+		return x2, y2

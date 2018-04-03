@@ -20,7 +20,7 @@ class StackPanel(Rect):
 		if self.optimize != "no":
 			if not (self._completely_revoked or self._revoked) and self._render_cache:
 				# Nothing was changed since last render
-				return self._render_cache
+				return self._render_cache[2:]
 
 
 		# Guess container size
@@ -41,16 +41,16 @@ class StackPanel(Rect):
 			width, height = self.width, self.height
 
 		x1, y1 = self.render_offset
-		_, _, x2, y2 = super(StackPanel, self).render(dry_run=dry_run, width=width, height=height)
+		x2, y2 = super(StackPanel, self).render(dry_run=dry_run, width=width, height=height)
 		self.renderChildren(x1, y1, x2, y2, dry_run=dry_run, stretch=stretch)
 
 		if not dry_run:
 			self._render_cache = x1, y1, x2, y2
-		return x1, y1, x2, y2
+		return x2, y2
 
 	def guessContainerSize(self, stretch=None):
 		x1, y1 = self.render_offset
-		_, _, x2, y2 = super(StackPanel, self).render(dry_run=True, width=self.width or 0, height=self.height or 0)
+		x2, y2 = super(StackPanel, self).render(dry_run=True, width=self.width or 0, height=self.height or 0)
 
 		return self.renderChildren(x1, y1, x2, y2, dry_run=True, stretch=stretch)
 
@@ -132,7 +132,7 @@ class StackPanel(Rect):
 					rerender = "maybe"
 
 			try:
-				child_x1, child_y1, child_x2, child_y2 = self.renderChild(
+				child_x2, child_y2 = self.renderChild(
 					child, dry_run=dry_run,
 
 					offset=(cur_x, cur_y),
@@ -148,8 +148,8 @@ class StackPanel(Rect):
 				row_column_has_stretch_problems = True
 				continue
 
-			max_width = max(max_width, child_x2 - child_x1)
-			max_height = max(max_height, child_y2 - child_y1)
+			max_width = max(max_width, child_x2 - cur_x)
+			max_height = max(max_height, child_y2 - cur_y)
 
 			if self.vertical:
 				cur_y = child_y2 + hspacing

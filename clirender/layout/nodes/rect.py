@@ -33,4 +33,4 @@ class Rect(Node):
 
 		x1, y1 = self.render_offset
 		x2, y2 = x1 + width, y1 + height
-		return x1, y1, x2, y2
+		return x2, y2
