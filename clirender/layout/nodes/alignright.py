@@ -20,19 +20,19 @@ class AlignRight(Rect):
 		else:
 			height = self.height
 
-		x1, y1 = self.render_offset
 		x2, y2 = super(AlignRight, self).render(dry_run=dry_run, height=height)
-		self.renderChildren(x1, y1, x2, y2, dry_run=dry_run, child_width=child_width)
+		self.renderChildren(x2, y2, dry_run=dry_run, child_width=child_width)
 
 		return x2, y2
 
 	def guessContainerSize(self):
-		x1, y1 = self.render_offset
 		x2, y2 = super(AlignRight, self).render(dry_run=True, width=self.width, height=self.height or 0)
 
-		return self.renderChildren(x1, y1, x2, y2, dry_run=True)
+		return self.renderChildren(x2, y2, dry_run=True)
 
-	def renderChildren(self, x1, y1, x2, y2, dry_run=False, child_width=None):
+	def renderChildren(self, x2, y2, dry_run=False, child_width=None):
+		x1, y1 = self.render_offset
+
 		if child_width is not None:
 			x1 = x2 - child_width
 

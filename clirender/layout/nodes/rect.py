@@ -31,6 +31,4 @@ class Rect(Node):
 			if not dry_run:
 				self.layout.screen.fill(x1, y1, x2, y2, char=" ", style=lambda s: self.layout.screen.colorize(s, bg=bg))
 
-		x1, y1 = self.render_offset
-		x2, y2 = x1 + width, y1 + height
-		return x2, y2
+		return self.render_offset[0] + width, self.render_offset[1] + height

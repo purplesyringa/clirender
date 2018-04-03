@@ -20,7 +20,7 @@ class StackPanel(Rect):
 		if self.optimize != "no":
 			if not (self._completely_revoked or self._revoked) and self._render_cache:
 				# Nothing was changed since last render
-				return self._render_cache[2:]
+				return self._render_cache[1]
 
 
 		# Guess container size
@@ -40,21 +40,19 @@ class StackPanel(Rect):
 			# If the size is given, don't do unnecessary actions
 			width, height = self.width, self.height
 
-		x1, y1 = self.render_offset
 		x2, y2 = super(StackPanel, self).render(dry_run=dry_run, width=width, height=height)
-		self.renderChildren(x1, y1, x2, y2, dry_run=dry_run, stretch=stretch)
+		self.renderChildren(x2, y2, dry_run=dry_run, stretch=stretch)
 
 		if not dry_run:
-			self._render_cache = x1, y1, x2, y2
+			self._render_cache = self.render_offset, (x2, y2)
 		return x2, y2
 
 	def guessContainerSize(self, stretch=None):
-		x1, y1 = self.render_offset
 		x2, y2 = super(StackPanel, self).render(dry_run=True, width=self.width or 0, height=self.height or 0)
 
-		return self.renderChildren(x1, y1, x2, y2, dry_run=True, stretch=stretch)
+		return self.renderChildren(x2, y2, dry_run=True, stretch=stretch)
 
-	def renderChildren(self, x1, y1, x2, y2, dry_run=False, stretch=None):
+	def renderChildren(self, x2, y2, dry_run=False, stretch=None):
 		if self._completely_revoked:
 			# Position was changed
 			rerender = True
@@ -75,6 +73,7 @@ class StackPanel(Rect):
 		wspacing = self.layout.calcRelativeSize(self.wspacing, self.render_parent_width,  self.render_stretch)
 		hspacing = self.layout.calcRelativeSize(self.hspacing, self.render_parent_height, self.render_stretch)
 
+		x1, y1 = self.render_offset
 		cur_x, cur_y = x1, y1
 		max_width, max_height = 0, 0
 
@@ -126,7 +125,7 @@ class StackPanel(Rect):
 					if hasattr(child, "_render_cache"):
 						# Maybe the position wasn't changed, and we don't have to
 						# rerender completely?
-						if child._render_cache[:2] != (cur_x, cur_y):
+						if child._render_cache[0] != (cur_x, cur_y):
 							rerender = "this"
 				elif child._revoked:
 					rerender = "maybe"
