@@ -14,9 +14,9 @@ class TabSwitch(Library):
 	def loop(self, instances):
 		key = instances["KeyPress"].getKey()
 		if key == 9: # Tab
-			self.tab()
+			self.tab(instances)
 
-	def tab(self):
+	def tab(self, instances):
 		if self.focused_id >= len(self.focusable):
 			self.focused_id = 0
 
@@ -30,6 +30,11 @@ class TabSwitch(Library):
 			self.focused_id = 0
 
 		new = self.focusable[self.focused_id]
+
+
+		if "Events" in instances:
+			old.emit("blur", new)
+			new.emit("focus", old)
 
 		old.revoke()
 		new.revoke()
