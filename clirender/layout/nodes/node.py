@@ -84,8 +84,9 @@ class Node(object):
 		return value
 
 
-	def renderChild(self, child, dry_run, offset, boundary_left_top, boundary_right_bottom, parent_width, parent_height, stretch, completely_revoked=True):
+	def renderChild(self, child, dry_run, offset, boundary_left_top, boundary_right_bottom, parent_width, parent_height, stretch, completely_revoked=True, plus_size=(0, 0)):
 		child.render_offset = offset
+		child.render_plus_size = plus_size
 		child.render_boundary_left_top = boundary_left_top
 		child.render_boundary_right_bottom = boundary_right_bottom
 		child.render_stretch = stretch
