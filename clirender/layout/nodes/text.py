@@ -4,8 +4,8 @@ class Text(Node):
 	container = False
 	text_container = True
 
-	def __init__(self, value, width=None, bg=None, color=None, bright=False, fill=False):
-		super(Text, self).__init__(value=value)
+	def __init__(self, value, width=None, bg=None, color=None, bright=False, fill=False, **kwargs):
+		super(Text, self).__init__(value=value, **kwargs)
 
 		self.width = width
 		self.bg = bg

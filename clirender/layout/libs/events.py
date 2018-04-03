@@ -4,8 +4,8 @@ from ..nodes import Node
 class Events(Library):
 	@patch(Node)
 	class Node(object):
-		def __init__(self, *args, **kwargs):
-			super(Events.Node, self).__init__(*args, **kwargs)
+		def __init__(self, **kwargs):
+			super(Events.Node, self).__init__(**kwargs)
 
 			self._events = {}
 

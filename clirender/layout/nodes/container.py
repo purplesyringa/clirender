@@ -4,11 +4,6 @@ class Container(Node):
 	container = True
 	text_container = False
 
-	def __init__(self, type=None, children=[]):
-		super(Container, self).__init__(children=children)
-
-		self.type = type
-
 	def render(self, dry_run=False):
 		if len(self.children) != 1:
 			raise ValueError("<Container> can contain only one node")
