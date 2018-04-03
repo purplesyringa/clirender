@@ -3,7 +3,7 @@ from ..patch import patch
 from ..nodes import Node, Generator
 
 class Events(Library):
-	@patch(Node)
+	@patch(Node, Generator)
 	class Node(object):
 		def __init__(self, **kwargs):
 			patch.super(self).__init__(**kwargs)
