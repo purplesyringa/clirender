@@ -1,11 +1,12 @@
-from library import Library, patch
-from ..nodes import Node
+from library import Library
+from ..patch import patch
+from ..nodes import Node, Generator
 
 class Events(Library):
 	@patch(Node)
 	class Node(object):
 		def __init__(self, **kwargs):
-			super(Events.Node, self).__init__(**kwargs)
+			patch.super(self).__init__(**kwargs)
 
 			self._events = {}
 

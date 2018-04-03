@@ -12,20 +12,3 @@ def Slot(name, wrapped=False):
 		return slot
 
 	return wrapper
-
-def patch(obj):
-	def wrapper(cls):
-		if not isinstance(cls, type):
-			raise TypeError("Can only @patch a class")
-
-		names = set(dir(cls)) # All variables
-		names -= set(dir(type)) # Remove some __vars__
-		if "__weakref__" in names:
-			names.remove("__weakref__") # Remove __weakref__
-
-		for name in names:
-			setattr(obj, name, getattr(cls, name))
-
-		return obj
-
-	return wrapper
