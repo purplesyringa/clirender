@@ -17,7 +17,10 @@ class Generator(object):
 			self.init(**self._kwargs)
 			self._initted = True
 
-		return self.onGenerate()
+		if self._cached is None:
+			self._cached = self.onGenerate()
+
+		return self._cached
 
 	def onGenerate(self):
 		raise NotImplementedError
