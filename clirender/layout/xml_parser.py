@@ -226,9 +226,12 @@ def getTextInside(node, slots, global_slots, allow_nodes=False):
 
 
 def evaluatable(name, expr, global_slots):
-	def func():
+	def func(*args, **kwargs):
+		for pos, value in enumerate(args):
+			kwargs["arg" + str(pos)] = value
+
 		try:
-			return evaluate(expr, slots={}, global_slots=global_slots)
+			return evaluate(expr, slots=kwargs, global_slots=global_slots)
 		except Exception, e:
 			raise ValueError("Could not evaluate ::%s: %s" % (name, e))
 
