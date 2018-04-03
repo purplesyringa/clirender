@@ -104,3 +104,16 @@ class Node(object):
 		child.cache_sizes = sizes
 		child.cache_offset = offset
 		return sizes
+
+
+	def getBoundaryRect(self):
+		return dict(
+			left=child.cache_offset[0],
+			top=child.cache_offset[0],
+
+			right=child.cache_offset[0] + child.cache_sizes[0],
+			bottom=child.cache_offset[1] + child.cache_sizes[1],
+
+			width=child.cache_sizes[0],
+			height=child.cache_sizes[1]
+		)
