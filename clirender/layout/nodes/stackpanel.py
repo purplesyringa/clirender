@@ -107,14 +107,15 @@ class StackPanel(Rect):
 				row_column_has_stretch_problems = False
 				continue
 
-			boundary_left_top = self.render_boundary_left_top
-			boundary_right_bottom = self.render_boundary_right_bottom
+			boundary_left_top = self.render_boundary_left_top[:]
+			boundary_left_top[0] = max(boundary_left_top[0], cur_x)
+			boundary_left_top[1] = max(boundary_left_top[1], cur_y)
+
+			boundary_right_bottom = self.render_boundary_right_bottom[:]
 			if self.width is not None:
-				boundary_left_top[0] = x1
-				boundary_right_bottom[0] = x2
+				boundary_right_bottom[0] = min(boundary_right_bottom[0], x2)
 			if self.height is not None:
-				boundary_left_top[1] = y1
-				boundary_right_bottom[1] = y2
+				boundary_right_bottom[1] = min(boundary_right_bottom[1], y2)
 
 			if self.optimize == "aggressive":
 				if rerender == "this":
