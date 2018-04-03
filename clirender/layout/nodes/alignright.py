@@ -40,14 +40,14 @@ class AlignRight(Rect):
 
 			offset=(x1, y1),
 
-			boundary_left_top=(
+			boundary_left_top=[
 				x1,
 				y1 if self.height is not None else self.render_boundary_left_top[1]
-			),
-			boundary_right_bottom=(
+			],
+			boundary_right_bottom=[
 				x2,
 				y2 if self.height is not None else self.render_boundary_right_bottom[1]
-			),
+			],
 
 			stretch=self.render_stretch
 		)
