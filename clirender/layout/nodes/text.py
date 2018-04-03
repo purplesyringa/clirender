@@ -20,11 +20,13 @@ class Text(Node):
 		else:
 			width = len(self.value)
 
+		width += self.render_plus_size[0]
+
 		x, y = self.render_offset
 
 		if not (self.render_boundary_left_top[0] <= x <= x + width <= self.render_boundary_right_bottom[0]):
 			return width, 1
-		elif not (self.render_boundary_left_top[1] <= y <= self.render_boundary_right_bottom[1]):
+		elif not (self.render_boundary_left_top[1] <= y < self.render_boundary_right_bottom[1]):
 			return width, 1
 
 		bg = self.inherit("bg")
