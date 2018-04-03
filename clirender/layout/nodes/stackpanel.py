@@ -72,8 +72,8 @@ class StackPanel(Rect):
 		if self.optimize == "no":
 			rerender = True
 
-		wspacing = self.layout.calcRelativeSize(self.wspacing, self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
-		hspacing = self.layout.calcRelativeSize(self.hspacing, self.render_boundary_right_bottom[1] - self.render_boundary_left_top[1], self.render_stretch)
+		wspacing = self.layout.calcRelativeSize(self.wspacing, self.render_parent_width,  self.render_stretch)
+		hspacing = self.layout.calcRelativeSize(self.hspacing, self.render_parent_height, self.render_stretch)
 
 		cur_x, cur_y = x1, y1
 		max_width, max_height = 0, 0

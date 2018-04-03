@@ -16,7 +16,7 @@ class Text(Node):
 	def render(self, dry_run=False):
 		if self.width is not None:
 			width = self.width
-			width = self.layout.calcRelativeSize(width, self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
+			width = self.layout.calcRelativeSize(width, self.render_parent_width, self.render_stretch)
 		else:
 			width = len(self.value)
 
