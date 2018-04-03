@@ -40,7 +40,8 @@ class StackPanel(Rect):
 			# If the size is given, don't do unnecessary actions
 			width, height = self.width, self.height
 
-		x1, y1, x2, y2 = super(StackPanel, self).render(dry_run=dry_run, width=width, height=height)
+		x1, y1 = self.render_offset
+		_, _, x2, y2 = super(StackPanel, self).render(dry_run=dry_run, width=width, height=height)
 		self.renderChildren(x1, y1, x2, y2, dry_run=dry_run, stretch=stretch)
 
 		if not dry_run:
@@ -48,7 +49,8 @@ class StackPanel(Rect):
 		return x1, y1, x2, y2
 
 	def guessContainerSize(self, stretch=None):
-		x1, y1, x2, y2 = super(StackPanel, self).render(dry_run=True, width=self.width or 0, height=self.height or 0)
+		x1, y1 = self.render_offset
+		_, _, x2, y2 = super(StackPanel, self).render(dry_run=True, width=self.width or 0, height=self.height or 0)
 
 		return self.renderChildren(x1, y1, x2, y2, dry_run=True, stretch=stretch)
 
