@@ -16,6 +16,7 @@ class Node(object):
 		self._revoked = False
 		self._completely_revoked = False
 		self.cache_sizes = (None, None)
+		self.cache_offset = (None, None)
 
 	@property
 	def children(self):
@@ -86,6 +87,8 @@ class Node(object):
 
 
 	def renderChild(self, child, dry_run, offset, boundary_left_top, boundary_right_bottom, parent_width, parent_height, stretch, completely_revoked=True, plus_size=(0, 0)):
+		child.cache_offset = child.render_offset
+
 		child.render_offset = offset
 		child.render_plus_size = plus_size
 		child.render_boundary_left_top = boundary_left_top
@@ -99,4 +102,5 @@ class Node(object):
 
 		sizes = child.render(dry_run=dry_run)
 		child.cache_sizes = sizes
+		child.cache_offset = offset
 		return sizes
