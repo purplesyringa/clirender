@@ -135,6 +135,8 @@ class StackPanel(Rect):
 					offset=(cur_x, cur_y),
 					boundary_left_top=boundary_left_top,
 					boundary_right_bottom=boundary_right_bottom,
+					parent_width=x2 - x1,
+					parent_height=y2 - y1,
 					stretch = stretch,
 
 					completely_revoked=(rerender is True or rerender == "this")

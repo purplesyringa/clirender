@@ -49,6 +49,9 @@ class AlignRight(Rect):
 				y2 if self.height is not None else self.render_boundary_right_bottom[1]
 			],
 
+			parent_width=x2 - x1,
+			parent_height=y2 - y1,
+
 			stretch=self.render_stretch
 		)
 
