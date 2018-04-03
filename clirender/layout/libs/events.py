@@ -1,6 +1,7 @@
 from library import Library
 from ..patch import patch
 from ..nodes import Node, Generator
+from ..api import createAPI
 
 class Events(Library):
 	@patch(Node, Generator)
@@ -34,5 +35,6 @@ class Events(Library):
 
 	@staticmethod
 	def safe(handler, node):
-		# TODO
-		return handler
+		def wrapper(*args, **kwargs):
+			return handler(self=createAPI(node), *args, **kwargs)
+		return wrapper
