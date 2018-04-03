@@ -40,4 +40,4 @@ class Text(Node):
 					self.layout.screen.printAt(self.layout.screen.colorize(self.value, bg=bg, fg=color, bright=self.bright), x1, y1)
 					self.layout.screen.printAt(self.layout.screen.colorize(" " * int(width - len(self.value)), bg=bg), x1 + len(self.value), y1)
 
-		return x2, y2
+		return x2 - x1, y2 - y1

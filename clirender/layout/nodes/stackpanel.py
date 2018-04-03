@@ -1,6 +1,7 @@
 from rect import Rect
 from switch import Switch
 from ..exceptions import NoStretchError
+import operator
 
 class StackPanel(Rect):
 	container = True
@@ -20,7 +21,7 @@ class StackPanel(Rect):
 		if self.optimize != "no":
 			if not (self._completely_revoked or self._revoked) and self._render_cache:
 				# Nothing was changed since last render
-				return self._render_cache[1]
+				return map(operator.sub, self._render_cache[1], self._render_cache[0])
 
 
 		# Guess container size
@@ -40,17 +41,19 @@ class StackPanel(Rect):
 			# If the size is given, don't do unnecessary actions
 			width, height = self.width, self.height
 
-		x2, y2 = super(StackPanel, self).render(dry_run=dry_run, width=width, height=height)
-		self.renderChildren(x2, y2, dry_run=dry_run, stretch=stretch)
+		x1, y1 = self.render_offset
+		width, height = super(StackPanel, self).render(dry_run=dry_run, width=width, height=height)
+		self.renderChildren(x1 + width, y1 + height, dry_run=dry_run, stretch=stretch)
 
 		if not dry_run:
-			self._render_cache = self.render_offset, (x2, y2)
-		return x2, y2
+			self._render_cache = self.render_offset, map(operator.add, self.render_offset, (width, height))
+		return width, height
 
 	def guessContainerSize(self, stretch=None):
-		x2, y2 = super(StackPanel, self).render(dry_run=True, width=self.width or 0, height=self.height or 0)
+		x1, y1 = self.render_offset
+		width, height = super(StackPanel, self).render(dry_run=True, width=self.width or 0, height=self.height or 0)
 
-		return self.renderChildren(x2, y2, dry_run=True, stretch=stretch)
+		return self.renderChildren(x1 + width, y1 + height, dry_run=True, stretch=stretch)
 
 	def renderChildren(self, x2, y2, dry_run=False, stretch=None):
 		if self._completely_revoked:
@@ -131,7 +134,7 @@ class StackPanel(Rect):
 					rerender = "maybe"
 
 			try:
-				child_x2, child_y2 = self.renderChild(
+				child_width, child_height = self.renderChild(
 					child, dry_run=dry_run,
 
 					offset=(cur_x, cur_y),
@@ -147,13 +150,13 @@ class StackPanel(Rect):
 				row_column_has_stretch_problems = True
 				continue
 
-			max_width = max(max_width, child_x2 - cur_x)
-			max_height = max(max_height, child_y2 - cur_y)
+			max_width = max(max_width, child_width)
+			max_height = max(max_height, child_height)
 
 			if self.vertical:
-				cur_y = child_y2 + hspacing
+				cur_y += child_height + hspacing
 			else:
-				cur_x = child_x2 + wspacing
+				cur_x += child_width + wspacing
 
 		if len(rows_columns_no_stretch) < len(rows_columns):
 			# Some rows/columns used 'stretch' variable, which was not calculated yet
