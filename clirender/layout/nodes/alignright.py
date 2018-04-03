@@ -4,9 +4,6 @@ class AlignRight(Rect):
 	container = True
 	text_container = False
 
-	def __init__(self, width, height=None, bg=None, children=[]):
-		super(AlignRight, self).__init__(width=width, height=height, bg=bg, children=children)
-
 	def render(self, dry_run=False):
 		if len(self.children) != 1:
 			raise ValueError("<AlignRight> can contain only one node")

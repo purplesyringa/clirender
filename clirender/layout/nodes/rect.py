@@ -4,8 +4,8 @@ class Rect(Node):
 	container = False
 	text_container = False
 
-	def __init__(self, width, height, bg=None, children=None):
-		super(Rect, self).__init__(children=children)
+	def __init__(self, width, height, bg=None, children=None, **kwargs):
+		super(Rect, self).__init__(children=children, **kwargs)
 
 		self.width = width
 		self.height = height
