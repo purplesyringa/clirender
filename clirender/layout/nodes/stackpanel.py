@@ -21,7 +21,7 @@ class StackPanel(Rect):
 		if self.optimize != "no":
 			if not (self._completely_revoked or self._revoked) and self._render_cache:
 				# Nothing was changed since last render
-				return self._render_cache[1]
+				return self.cache_sizes
 
 
 		# Guess container size
@@ -45,7 +45,7 @@ class StackPanel(Rect):
 		self.renderChildren(width, height, dry_run=dry_run, stretch=stretch)
 
 		if not dry_run:
-			self._render_cache = self.render_offset, (width, height)
+			self._render_cache = self.render_offset
 		return width, height
 
 	def guessContainerSize(self, stretch=None):
@@ -128,7 +128,7 @@ class StackPanel(Rect):
 					if hasattr(child, "_render_cache"):
 						# Maybe the position wasn't changed, and we don't have to
 						# rerender completely?
-						if child._render_cache[0] != (cur_x, cur_y):
+						if child._render_cache != (cur_x, cur_y):
 							rerender = "this"
 				elif child._revoked:
 					rerender = "maybe"
