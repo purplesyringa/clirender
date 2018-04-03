@@ -16,19 +16,16 @@ class Text(Node):
 	def render(self, dry_run=False):
 		if self.width is not None:
 			width = self.width
-			width = self.layout.calcRelativeSize(width, self.render_boundary_right_bottom[0] - self.render_boundary_left_top[0], self.render_stretch)
+			width = self.layout.calcRelativeSize(width, self.render_parent_width, self.render_stretch)
 		else:
 			width = len(self.value)
 
-		x1, y1 = map(max, zip(self.render_offset, self.render_boundary_left_top))
+		x, y = self.render_offset
 
-		x2, y2 = self.render_offset[0] + width, self.render_offset[1] + 1
-		x2, y2 = map(min, zip((x2, y2), self.render_boundary_right_bottom))
-
-		if not (self.render_boundary_left_top[0] <= x1 <= x2 <= self.render_boundary_right_bottom[0]):
-			return x1, y1, x2, y2
-		elif not (self.render_boundary_left_top[1] <= y1 < y2 <= self.render_boundary_right_bottom[1]):
-			return x1, y1, x2, y2
+		if not (self.render_boundary_left_top[0] <= x <= x + width <= self.render_boundary_right_bottom[0]):
+			return width, 1
+		elif not (self.render_boundary_left_top[1] <= y <= self.render_boundary_right_bottom[1]):
+			return width, 1
 
 		bg = self.inherit("bg")
 		color = self.inherit("color")
@@ -37,9 +34,9 @@ class Text(Node):
 		if color is not None:
 			if not dry_run:
 				if self.fill:
-					self.layout.screen.fill(x1, y1, x2, y2, char=self.value, style=lambda s: self.layout.screen.colorize(s, bg=bg, fg=color, bright=bright))
+					self.layout.screen.fill(x, y, x + width, y + 1, char=self.value, style=lambda s: self.layout.screen.colorize(s, bg=bg, fg=color, bright=bright))
 				else:
-					self.layout.screen.printAt(self.layout.screen.colorize(self.value, bg=bg, fg=color, bright=self.bright), x1, y1)
-					self.layout.screen.printAt(self.layout.screen.colorize(" " * int(width - len(self.value)), bg=bg), x1 + len(self.value), y1)
+					self.layout.screen.printAt(self.layout.screen.colorize(self.value, bg=bg, fg=color, bright=self.bright), x, y)
+					self.layout.screen.printAt(self.layout.screen.colorize(" " * int(width - len(self.value)), bg=bg), x + len(self.value), y)
 
-		return x1, y1, x2, y2
+		return width, 1
