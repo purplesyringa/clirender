@@ -6,7 +6,7 @@ class NodeAPI(object):
 		if isinstance(node, Node):
 			return node.getBoundaryBox()
 		else:
-			raise ValueError("getBoundaryBox(): Not defined on %s" % type(node))
+			raise self._unexpectedType("getBoundaryBox()")
 
 	@property
 	def childNodes(self):
@@ -16,7 +16,7 @@ class NodeAPI(object):
 		elif isinstance(node, Generator):
 			return map(createAPI, node.generate())
 		else:
-			raise ValueError("childNodes: Not defined on %s" % type(node))
+			raise self._unexpectedType("childNodes")
 
 	@property
 	def children(self):
@@ -26,7 +26,7 @@ class NodeAPI(object):
 		elif isinstance(node, Generator):
 			return map(createAPI, self._get_children_recursively(node))
 		else:
-			raise ValueError("children: Not defined on %s" % type(node))
+			raise self._unexpectedType("children")
 
 	def _get_children_recursively(self, generator):
 		res = []
@@ -36,6 +36,11 @@ class NodeAPI(object):
 			else:
 				res.append(node)
 		return res
+
+
+	def _unexpectedType(self, callee):
+		node = storage[self]
+		return ValueError("%s: Not defined on %s" % (callee, type(node)))
 
 
 # storage[self] is a way to simulate private scope, so that Node or Generator
