@@ -32,14 +32,10 @@ class Node(object):
 		children = []
 		for child in old:
 			if isinstance(child, Generator):
-				if child._cached is not None:
-					generated = child._cached
-				else:
-					child.parent = self
-					child.layout = self.layout
-					generated = child.generate()
+				child.parent = self
+				child.layout = self.layout
+				generated = child.generate()
 
-				child._cached = generated
 				for subchild in self._get_children(generated):
 					if not hasattr(subchild, "generated_by"):
 						subchild.generated_by = []
@@ -108,12 +104,12 @@ class Node(object):
 
 	def getBoundaryBox(self):
 		return dict(
-			left=child.cache_offset[0],
-			top=child.cache_offset[0],
+			left=self.cache_offset[0],
+			top=self.cache_offset[1],
 
-			right=child.cache_offset[0] + child.cache_sizes[0],
-			bottom=child.cache_offset[1] + child.cache_sizes[1],
+			right=self.cache_offset[0] + self.cache_sizes[0],
+			bottom=self.cache_offset[1] + self.cache_sizes[1],
 
-			width=child.cache_sizes[0],
-			height=child.cache_sizes[1]
+			width=self.cache_sizes[0],
+			height=self.cache_sizes[1]
 		)
