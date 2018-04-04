@@ -1,12 +1,12 @@
 from nodes import Node
 
 class NodeAPI(object):
-	def getBoundingBox(self):
+	def getBoundaryBox(self):
 		node = storage[self]
 		if isinstance(node, Node):
-			return node.getBoundingBox()
+			return node.getBoundaryBox()
 		else:
-			raise ValueError("getBoundingBox(): Not defined on %s" % type(node))
+			raise ValueError("getBoundaryBox(): Not defined on %s" % type(node))
 
 
 # storage[self] is a way to simulate private scope, so that Node or Generator
