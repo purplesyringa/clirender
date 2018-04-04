@@ -104,12 +104,12 @@ class Node(object):
 
 	def getBoundaryBox(self):
 		return dict(
-			left=child.cache_offset[0],
-			top=child.cache_offset[0],
+			left=self.cache_offset[0],
+			top=self.cache_offset[1],
 
-			right=child.cache_offset[0] + child.cache_sizes[0],
-			bottom=child.cache_offset[1] + child.cache_sizes[1],
+			right=self.cache_offset[0] + self.cache_sizes[0],
+			bottom=self.cache_offset[1] + self.cache_sizes[1],
 
-			width=child.cache_sizes[0],
-			height=child.cache_sizes[1]
+			width=self.cache_sizes[0],
+			height=self.cache_sizes[1]
 		)
