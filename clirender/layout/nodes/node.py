@@ -7,6 +7,7 @@ class Node(object):
 		self.render_boundary_left_top = [None, None]
 		self.render_boundary_right_bottom = [None, None]
 		self.parent = None
+		self.gen_parent = None
 		self.render_stretch = None
 
 		self.inheritable = {}
@@ -20,23 +21,25 @@ class Node(object):
 
 	@property
 	def children(self):
-		return self._get_children(self._children)
+		return self._get_children(self._children, self)
 
 	@children.setter
 	def children(self, children):
 		self._children = children
 
-	def _get_children(self, old):
+	def _get_children(self, old, gen_parent):
 		from generator import Generator
 
 		children = []
 		for child in old:
+			child.parent = self
+
 			if isinstance(child, Generator):
-				child.parent = self
+				child.gen_parent = gen_parent
 				child.layout = self.layout
 				generated = child.generate()
 
-				for subchild in self._get_children(generated):
+				for subchild in self._get_children(generated, child):
 					if not hasattr(subchild, "generated_by"):
 						subchild.generated_by = []
 					subchild.generated_by.append(child)
@@ -92,7 +95,6 @@ class Node(object):
 		child.render_stretch = stretch
 		child.render_parent_width = parent_width
 		child.render_parent_height = parent_height
-		child.parent = self
 		child.layout = self.layout
 		child._completely_revoked = completely_revoked
 

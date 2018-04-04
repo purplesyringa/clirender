@@ -5,6 +5,10 @@ class Generator(object):
 	def __init__(self, slots, children=[], **kwargs):
 		self.children = children
 		self.slots = slots
+
+		self.parent = None
+		self.gen_parent = None
+
 		self._cached = None
 		self._kwargs = kwargs
 		self._initted = False
