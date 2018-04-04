@@ -10,7 +10,7 @@ class NodeAPI(object):
 
 
 # storage[self] is a way to simulate private scope, so that Node or Generator
-# couldn't be accessed inside
+# couldn't be accessed from outside
 storage = dict()
 
 def createAPI(node):
