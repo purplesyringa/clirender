@@ -47,7 +47,7 @@ def patch(*objects):
 				obj._patched_obj = obj
 
 			for name in names:
-				if not hasattr(cls, name):
+				if name not in cls.__dict__:
 					continue
 
 				if name not in obj._unpatched and hasattr(obj, name):
