@@ -38,6 +38,14 @@ class NodeAPI(object):
 		return res
 
 
+	def isNode(self):
+		node = storage[self]
+		return isinstance(node, Node)
+	def isGenerator(self):
+		node = storage[self]
+		return isinstance(node, Generator)
+
+
 	def _unexpectedType(self, callee):
 		node = storage[self]
 		return ValueError("%s: Not defined on %s" % (callee, type(node)))
