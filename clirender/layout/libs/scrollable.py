@@ -6,6 +6,7 @@ class Scrollable(Library):
 	class Scrolled(Node):
 		container = True
 		text_container = False
+		properties = ["x", "y"]
 
 		def __init__(self, x=0, y=0, children=[]):
 			super(Scrollable.Scrolled, self).__init__(children=children)

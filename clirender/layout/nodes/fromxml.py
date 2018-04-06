@@ -5,6 +5,8 @@ class NoDefault(object):
 
 def fromXml(elem, slots, name, defines, container, additional_nodes, global_slots):
 	class FromXml(Generator):
+		properties = []
+
 		def __new__(cls, **attrs):
 			from ..xml_parser import handleElement
 

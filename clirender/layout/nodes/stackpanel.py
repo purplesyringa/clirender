@@ -6,6 +6,7 @@ import operator
 class StackPanel(Rect):
 	container = True
 	text_container = False
+	properties = ["orientation", "hspacing", "wspacing", "optimize"]
 
 	def __init__(self, width=None, height=None, bg=None, orientation="horizontal", hspacing=0, wspacing=0, optimize="safe", children=[], **kwargs):
 		super(StackPanel, self).__init__(width=width, height=height, bg=bg, children=children, **kwargs)

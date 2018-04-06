@@ -3,6 +3,7 @@ from node import Node
 class Container(Node):
 	container = True
 	text_container = False
+	properties = []
 
 	def render(self, dry_run=False):
 		if len(self.children) != 1:

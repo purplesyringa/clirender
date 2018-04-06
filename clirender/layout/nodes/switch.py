@@ -3,6 +3,7 @@ from node import Node
 class Switch(Node):
 	container = False
 	text_container = False
+	properties = []
 
 	def __init__(self, **kwargs):
 		super(Switch, self).__init__(**kwargs)

@@ -3,6 +3,7 @@ from rect import Rect
 class AlignRight(Rect):
 	container = True
 	text_container = False
+	properties = ["height"]
 
 	def render(self, dry_run=False):
 		if len(self.children) != 1:

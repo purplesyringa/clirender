@@ -9,6 +9,7 @@ class Conditional(Library):
 	class If(Generator):
 		container = True
 		text_container = False
+		properties = ["is", "with", "then", "else"]
 
 		def init(self, is_, with_=None, then=None, else_=None):
 			self.is_ = is_
@@ -79,6 +80,7 @@ class Conditional(Library):
 	class _Inside(Generator):
 		container = True
 		text_container = False
+		properties = []
 
 		def onGenerate(self):
 			from ..xml_parser import handleElement

@@ -5,6 +5,7 @@ class Loops(Library):
 	class Range(Generator):
 		container = True
 		text_container = False
+		properties = ["from", "to", "step"]
 
 		def init(self, from_, to, step=1, slot=None):
 			self.from_ = from_
@@ -47,6 +48,7 @@ class Loops(Library):
 	class For(Generator):
 		container = True
 		text_container = False
+		properties = ["in"]
 
 		def init(self, in_, slot=None):
 			self.in_ = in_

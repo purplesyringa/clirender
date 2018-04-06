@@ -3,6 +3,7 @@ from node import Node
 class Rect(Node):
 	container = False
 	text_container = False
+	properties = ["width", "height", "bg"]
 
 	def __init__(self, width, height, bg=None, children=None, **kwargs):
 		super(Rect, self).__init__(children=children, **kwargs)

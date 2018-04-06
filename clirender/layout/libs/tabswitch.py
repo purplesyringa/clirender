@@ -42,6 +42,7 @@ class TabSwitch(Library):
 	class Focusable(Generator):
 		container = True
 		text_container = False
+		properties = []
 
 		def init(self, **kwargs):
 			self.layout.libs["TabSwitch"].focusable.append(self)
