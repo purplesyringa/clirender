@@ -59,6 +59,24 @@ class NodeAPI(object):
 		return node.__class__.__name__
 
 
+	def __getitem__(self, name):
+		node = storage[self]
+		if name not in node.properties:
+			raise ValueError("[]: %s is not a property" % name)
+		return getattr(node, name)
+
+	def __setitem__(self, name, value):
+		node = storage[self]
+		if name not in node.properties:
+			raise ValueError("[]: %s is not a property" % name)
+		setattr(node, name, value)
+
+		node._completely_revoked = True
+		while node is not None:
+			node._revoked = True
+			node = node.parent
+
+
 	def _unexpectedType(self, callee):
 		node = storage[self]
 		return ValueError("%s: Not defined on %s" % (callee, type(node)))
