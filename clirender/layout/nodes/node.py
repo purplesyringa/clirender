@@ -4,6 +4,7 @@ class Node(object):
 
 	def __init__(self, children=None, value=[], **kwargs):
 		self.render_offset = (None, None)
+		self.render_plus_size = (None, None)
 		self.render_boundary_left_top = [None, None]
 		self.render_boundary_right_bottom = [None, None]
 		self.parent = None
@@ -87,6 +88,7 @@ class Node(object):
 
 	def renderChild(self, child, dry_run, offset, boundary_left_top, boundary_right_bottom, parent_width, parent_height, stretch, completely_revoked=True, plus_size=(0, 0)):
 		child.cache_offset = child.render_offset
+		child.cache_plus_size = child.render_plus_size
 
 		child.render_offset = offset
 		child.render_plus_size = plus_size
@@ -101,13 +103,14 @@ class Node(object):
 		sizes = child.render(dry_run=dry_run)
 		child.cache_sizes = sizes
 		child.cache_offset = offset
+		child.cache_plus_size = plus_size
 		return sizes
 
 
 	def getBoundaryBox(self):
 		return dict(
-			left=self.cache_offset[0],
-			top=self.cache_offset[1],
+			left=self.cache_offset[0] + self.cache_plus_size[0],
+			top=self.cache_offset[1] + self.cache_plus_size[1],
 
 			right=self.cache_offset[0] + self.cache_sizes[0],
 			bottom=self.cache_offset[1] + self.cache_sizes[1],
