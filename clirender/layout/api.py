@@ -23,11 +23,19 @@ class NodeAPI(object):
 	def children(self):
 		node = storage[self]
 		if isinstance(node, Node):
+			return map(createAPI, node._children)
+		else:
+			raise self._unexpectedType("children")
+
+	@property
+	def childNodes(self):
+		node = storage[self]
+		if isinstance(node, Node):
 			return map(createAPI, node.children)
 		elif isinstance(node, Generator):
 			return map(createAPI, self._get_children_recursively(node))
 		else:
-			raise self._unexpectedType("children")
+			raise self._unexpectedType("childNodes")
 
 	def _get_children_recursively(self, generator):
 		res = []
