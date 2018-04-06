@@ -53,6 +53,12 @@ class NodeAPI(object):
 		return isinstance(node, Generator)
 
 
+	@property
+	def nodeName(self):
+		node = storage[self]
+		return node.__class__.__name__
+
+
 	def _unexpectedType(self, callee):
 		node = storage[self]
 		return ValueError("%s: Not defined on %s" % (callee, type(node)))
