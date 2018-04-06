@@ -52,6 +52,16 @@ class NodeAPI(object):
 		node = storage[self]
 		return createAPI(node.gen_parent)
 
+	def nearest(self, f, including=False):
+		if including and f(self):
+			return self
+
+		node = self.parent
+		while node is not None and not f(node):
+			node = node.parent
+
+		return node
+
 
 	def isNode(self):
 		node = storage[self]
