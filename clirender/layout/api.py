@@ -8,6 +8,7 @@ class NodeAPI(object):
 		else:
 			raise self._unexpectedType("getBoundaryBox()")
 
+
 	@property
 	def childNodes(self):
 		node = storage[self]
@@ -36,6 +37,12 @@ class NodeAPI(object):
 			else:
 				res.append(node)
 		return res
+
+
+	@property
+	def parent(self):
+		node = storage[self]
+		return createAPI(node.gen_parent)
 
 
 	def isNode(self):
