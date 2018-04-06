@@ -33,9 +33,9 @@ class Node(object):
 		children = []
 		for child in old:
 			child.parent = self
+			child.gen_parent = gen_parent
 
 			if isinstance(child, Generator):
-				child.gen_parent = gen_parent
 				child.layout = self.layout
 				generated = child.generate()
 
