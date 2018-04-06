@@ -10,7 +10,7 @@ class StackPanel(Rect):
 	def __init__(self, width=None, height=None, bg=None, orientation="horizontal", hspacing=0, wspacing=0, optimize="safe", children=[], **kwargs):
 		super(StackPanel, self).__init__(width=width, height=height, bg=bg, children=children, **kwargs)
 
-		self.vertical = orientation.lower() == "vertical"
+		self.orientation = orientation
 		self.hspacing = hspacing
 		self.wspacing = wspacing
 		self.optimize = optimize
@@ -25,7 +25,7 @@ class StackPanel(Rect):
 
 
 		# Guess container size
-		if self.vertical:
+		if self.orientation == "vertical":
 			stretch = self.width
 		else:
 			stretch = self.height
@@ -88,7 +88,7 @@ class StackPanel(Rect):
 		for child in self.children:
 			if isinstance(child, Switch):
 				# <Switch /> can be used to switch direction
-				if self.vertical:
+				if self.orientation == "vertical":
 					if not row_column_has_stretch_problems:
 						rows_columns_no_stretch.append(cur_y - y1)
 
@@ -153,21 +153,21 @@ class StackPanel(Rect):
 			max_width = max(max_width, child_width)
 			max_height = max(max_height, child_height)
 
-			if self.vertical:
+			if self.orientation == "vertical":
 				cur_y += child_height + hspacing
 			else:
 				cur_x += child_width + wspacing
 
 		if len(rows_columns_no_stretch) < len(rows_columns):
 			# Some rows/columns used 'stretch' variable, which was not calculated yet
-			if self.vertical:
+			if self.orientation == "vertical":
 				stretch = sum(rows_columns_no_stretch) + cur_y - y1
 			else:
 				stretch = sum(rows_columns_no_stretch) + cur_x - x1
 
 			return self.renderChildren(width, height, dry_run=dry_run, stretch=stretch)
 
-		if self.vertical:
+		if self.orientation == "vertical":
 			rows_columns.append((max_width, cur_y - y1))
 			return sum(value[0] for value in rows_columns), max(value[1] for value in rows_columns), stretch
 		else:
