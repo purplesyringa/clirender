@@ -9,8 +9,21 @@ class TabSwitch(Library):
 	def __init__(self, layout):
 		super(TabSwitch, self).__init__(layout)
 
-		self.focusable = []
+		self._focusable = []
 		self.focused = None
+
+	@property
+	def focusable(self):
+		return [node for node in self._focusable if not node.disabled]
+
+	def getFocused(self):
+		if self.focused in self.focusable:
+			return self.focused
+		elif len(self.focusable) > 0:
+			return self.focusable[0]
+		else:
+			return None
+
 
 	def loop(self, instances):
 		key = instances["KeyPress"].getKey()
@@ -19,14 +32,15 @@ class TabSwitch(Library):
 		elif key == Ctrl(KeyCodes.Tab): # Ctrl+Tab
 			self.tab(instances, backward=True)
 		else:
-			if self.focused:
-				self.focused.emit("keyPress", recursive=True, key=key)
+			focused = self.getFocused()
+			if focused is not None:
+				focused.emit("keyPress", recursive=True, key=key)
 
 	def tab(self, instances, backward=False):
-		if len(self.focusable) == 0:
+		old = self.getFocused()
+		if old is None:
 			return
 
-		old = self.focused or self.focusable[0]
 		index = self.focusable.index(old)
 
 		if backward:
@@ -53,8 +67,10 @@ class TabSwitch(Library):
 		text_container = False
 		properties = []
 
-		def init(self, **kwargs):
-			self.layout.libs["TabSwitch"].focusable.append(self)
+		def init(self, disabled=False, **kwargs):
+			self.disabled = disabled != False
+
+			self.layout.libs["TabSwitch"]._focusable.append(self)
 
 		def onGenerate(self):
 			from ..xml_parser import handleElement
@@ -66,5 +82,5 @@ class TabSwitch(Library):
 			TabSwitchInstance = self.layout.libs["TabSwitch"]
 
 			slots = dict(**self.slots)
-			slots["focused"] = self is (TabSwitchInstance.focused or TabSwitchInstance.focusable[0])
+			slots["focused"] = self is TabSwitchInstance.getFocused()
 			return handleElement(self.children[0], self.defines, slots, additional_nodes=self.additional_nodes, global_slots=self.global_slots)
