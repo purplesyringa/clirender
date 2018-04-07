@@ -18,7 +18,7 @@ class StackPanel(Rect):
 
 		self._render_cache = None
 
-	def render(self, dry_run=False):
+	def onRender(self, dry_run=False):
 		if self.optimize != "no":
 			if not (self._completely_revoked or self._revoked) and self._render_cache:
 				# Nothing was changed since last render
@@ -42,7 +42,7 @@ class StackPanel(Rect):
 			# If the size is given, don't do unnecessary actions
 			width, height = self.width, self.height
 
-		width, height = super(StackPanel, self).render(dry_run=dry_run, width=width, height=height)
+		width, height = self.render(StackPanel, dry_run=dry_run, width=width, height=height)
 		self.renderChildren(width, height, dry_run=dry_run, stretch=stretch)
 
 		if not dry_run:
@@ -50,7 +50,7 @@ class StackPanel(Rect):
 		return width, height
 
 	def guessContainerSize(self, stretch=None):
-		width, height = super(StackPanel, self).render(dry_run=True, width=self.width or 0, height=self.height or 0)
+		width, height = self.render(StackPanel, dry_run=True, width=self.width or 0, height=self.height or 0)
 
 		return self.renderChildren(width, height, dry_run=True, stretch=stretch)
 

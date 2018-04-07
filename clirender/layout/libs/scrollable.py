@@ -10,12 +10,11 @@ class Scrollable(Library):
 		text_container = False
 		properties = ["x", "y"]
 
-		def __init__(self, x=0, y=0, children=[]):
-			super(Scrollable.Scrolled, self).__init__(children=children)
+		def init(self, x=0, y=0):
 			self.x = float(x)
 			self.y = float(y)
 
-		def render(self, dry_run=False):
+		def onRender(self, dry_run=False):
 			if len(self.children) != 1:
 				raise ValueError("<Scrolled> can contain only one node")
 

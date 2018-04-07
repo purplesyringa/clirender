@@ -5,7 +5,7 @@ class Container(Node):
 	text_container = False
 	properties = []
 
-	def render(self, dry_run=False):
+	def onRender(self, dry_run=False):
 		if len(self.children) != 1:
 			raise ValueError("<Container> can contain only one node")
 

@@ -5,7 +5,7 @@ class Node(Element):
 	text_container = False
 
 	def __init__(self, children=None, value=[], **kwargs):
-		super(Node, self).__init__(**kwargs)
+		super(Node, self).__init__()
 
 		self.render_offset = (None, None)
 		self.render_plus_size = (None, None)
@@ -24,6 +24,9 @@ class Node(Element):
 		self._changed = False
 		self.cache_sizes = (None, None)
 		self.cache_offset = (None, None)
+
+		self._kwargs = kwargs
+		self._initted = False
 
 	@property
 	def children(self):
@@ -56,8 +59,21 @@ class Node(Element):
 
 		return children
 
-	def render(self, dry_run=False):
+
+	def init(self):
+		pass
+
+	def onRender(self, *args, **kwargs):
 		raise NotImplementedError
+
+	def render(self, cls=None, **kwargs):
+		if not self._initted:
+			self.init(**self._kwargs)
+			self._initted = True
+
+		obj = self if cls is None else super(cls, self)
+		return obj.onRender(**kwargs)
+
 
 	def inherit(self, attr):
 		node = self

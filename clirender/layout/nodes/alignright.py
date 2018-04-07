@@ -5,7 +5,7 @@ class AlignRight(Rect):
 	text_container = False
 	properties = ["height"]
 
-	def render(self, dry_run=False):
+	def onRender(self, dry_run=False):
 		if len(self.children) != 1:
 			raise ValueError("<AlignRight> can contain only one node")
 
@@ -18,13 +18,13 @@ class AlignRight(Rect):
 		else:
 			height = self.height
 
-		width, height = super(AlignRight, self).render(dry_run=dry_run, height=height)
+		width, height = self.render(AlignRight, dry_run=dry_run, height=height)
 		self.renderChildren(width, height, dry_run=dry_run, child_width=child_width)
 
 		return width, height
 
 	def guessContainerSize(self):
-		width, height = super(AlignRight, self).render(dry_run=True, width=self.width, height=self.height or 0)
+		width, height = self.render(AlignRight, dry_run=True, width=self.width, height=self.height or 0)
 		return self.renderChildren(width, height, dry_run=True)
 
 	def renderChildren(self, width, height, dry_run=False, child_width=None):

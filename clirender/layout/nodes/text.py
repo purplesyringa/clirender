@@ -5,16 +5,14 @@ class Text(Node):
 	text_container = True
 	properties = ["width", "bg", "color", "bright", "fill"]
 
-	def __init__(self, value, width=None, bg=None, color=None, bright=False, fill=False, **kwargs):
-		super(Text, self).__init__(value=value, **kwargs)
-
+	def init(self, width=None, bg=None, color=None, bright=False, fill=False):
 		self.width = width
 		self.bg = bg
 		self.color = color
 		self.bright = bright is not False
 		self.fill = fill is not False
 
-	def render(self, dry_run=False):
+	def onRender(self, dry_run=False):
 		if self.width is not None:
 			width = self.width
 			width = self.layout.calcRelativeSize(width, self.render_parent_width, self.render_stretch)

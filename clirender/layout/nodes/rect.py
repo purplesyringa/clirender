@@ -5,14 +5,12 @@ class Rect(Node):
 	text_container = False
 	properties = ["width", "height", "bg"]
 
-	def __init__(self, width, height, bg=None, children=None, **kwargs):
-		super(Rect, self).__init__(children=children, **kwargs)
-
+	def init(self, width, height, bg=None):
 		self.width = width
 		self.height = height
 		self.bg = bg
 
-	def render(self, dry_run=False, width=None, height=None):
+	def onRender(self, dry_run=False, width=None, height=None):
 		if width is None:
 			width = self.width
 		if height is None:
