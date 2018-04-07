@@ -21,7 +21,7 @@ class Scrollable(Library):
 			offset = map(operator.sub, offset, (self.x, self.y))
 			offset = tuple(offset)
 
-			return self.renderChild(
+			rendered = self.renderChild(
 				self.children[0], dry_run=dry_run,
 
 				offset=offset,
@@ -32,3 +32,5 @@ class Scrollable(Library):
 				parent_height=self.render_parent_height,
 				stretch=self.render_stretch
 			)
+
+			return map(operator.sub, rendered, (self.x, self.y))
