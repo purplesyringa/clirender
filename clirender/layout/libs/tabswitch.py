@@ -15,9 +15,11 @@ class TabSwitch(Library):
 	def loop(self, instances):
 		key = instances["KeyPress"].getKey()
 		if key == KeyCodes.Tab: # Tab
-			self.tab(instances)
+			self.tab(instances, backward=False)
+		elif key == Ctrl(KeyCodes.Tab): # Ctrl+Tab
+			self.tab(instances, backward=True)
 
-	def tab(self, instances):
+	def tab(self, instances, backward=False):
 		if self.focused_id >= len(self.focusable):
 			self.focused_id = 0
 
@@ -26,9 +28,14 @@ class TabSwitch(Library):
 
 		old = self.focusable[self.focused_id]
 
-		self.focused_id += 1
-		if self.focused_id >= len(self.focusable):
-			self.focused_id = 0
+		if backward:
+			self.focused_id -= 1
+			if self.focused_id < 0:
+				self.focused_id = len(self.focusable) - 1
+		else:
+			self.focused_id += 1
+			if self.focused_id >= len(self.focusable):
+				self.focused_id = 0
 
 		new = self.focusable[self.focused_id]
 
