@@ -30,8 +30,17 @@ class Events(Library):
 			self._events[event].append(handler)
 
 		def emit(self, event, *args, **kwargs):
+			if "recursive" in kwargs:
+				recursive = kwargs["recursive"]
+				del kwargs["recursive"]
+			else:
+				recursive = False
+
 			for handler in self._events.get(event, []):
 				handler(*args, **kwargs)
+
+			if recursive and self.gen_parent:
+				self.gen_parent.emit(event, recursive=True, *args, **kwargs)
 
 	@staticmethod
 	def safe(handler, node):
