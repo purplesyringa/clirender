@@ -1,11 +1,11 @@
 from library import Library
 from ..patch import patch
-from ..nodes import Node, Generator
+from ..nodes import Element
 from ..api import createAPI
 
 class Events(Library):
-	@patch(Node, Generator)
-	class Node(object):
+	@patch(Element)
+	class Element(object):
 		def init(self, **kwargs):
 			self._events = {}
 
