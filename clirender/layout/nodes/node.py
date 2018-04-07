@@ -1,8 +1,12 @@
-class Node(object):
+from element import Element
+
+class Node(Element):
 	container = False
 	text_container = False
 
 	def __init__(self, children=None, value=[], **kwargs):
+		super(Node, self).__init__()
+
 		self.render_offset = (None, None)
 		self.render_plus_size = (None, None)
 		self.render_boundary_left_top = [None, None]

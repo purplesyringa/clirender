@@ -1,8 +1,12 @@
-class Generator(object):
+from element import Element
+
+class Generator(Element):
 	container = False
 	text_container = False
 
 	def __init__(self, slots, children=[], **kwargs):
+		super(Generator, self).__init__()
+
 		self.children = children
 		self.slots = slots
 
