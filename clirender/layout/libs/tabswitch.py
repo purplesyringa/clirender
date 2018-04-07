@@ -1,6 +1,7 @@
 from library import Library
 from ..nodes import Generator
 from conditional import Conditional
+from keypress import KeyCodes, Ctrl
 
 class TabSwitch(Library):
 	dependencies = ["KeyPress"]
@@ -13,7 +14,7 @@ class TabSwitch(Library):
 
 	def loop(self, instances):
 		key = instances["KeyPress"].getKey()
-		if key == 9: # Tab
+		if key == KeyCodes.Tab: # Tab
 			self.tab(instances)
 
 	def tab(self, instances):
