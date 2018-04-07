@@ -41,8 +41,8 @@ class TabSwitch(Library):
 
 
 		if "Events" in instances:
-			old.emit("blur", new)
-			new.emit("focus", old)
+			old.emit("blur", new=new)
+			new.emit("focus", old=old)
 
 		old.revoke()
 		new.revoke()
