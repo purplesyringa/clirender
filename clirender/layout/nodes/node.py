@@ -17,6 +17,7 @@ class Node(object):
 		self.value = value
 		self._revoked = False
 		self._completely_revoked = False
+		self._changed = False
 		self.cache_sizes = (None, None)
 		self.cache_offset = (None, None)
 
@@ -98,7 +99,8 @@ class Node(object):
 		child.render_parent_width = parent_width
 		child.render_parent_height = parent_height
 		child.layout = self.layout
-		child._completely_revoked = completely_revoked
+		child._completely_revoked = child._changed or completely_revoked
+		child._changed = False
 
 		sizes = child.render(dry_run=dry_run)
 		child._revoked = False

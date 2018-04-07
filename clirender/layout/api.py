@@ -89,7 +89,7 @@ class NodeAPI(object):
 			raise ValueError("[]: %s is not a property" % name)
 		setattr(node, name, value)
 
-		node._completely_revoked = True
+		node._changed = True
 		while node is not None:
 			node._revoked = True
 			node = node.parent

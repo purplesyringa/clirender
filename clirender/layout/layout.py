@@ -23,7 +23,8 @@ class Layout(object):
 		self.root.parent = None
 		self.root.gen_parent = None
 		self.root.render_stretch = self.screen.terminal_size[0]
-		self.root._completely_revoked = force
+		self.root._completely_revoked = self.root._changed or force
+		self.root._changed = False
 
 		self.root.layout = self
 		self.root.render()
