@@ -51,6 +51,10 @@ def register(name, lib):
 	setattr(all, name, lib)
 
 def render(layout, libs):
+	layout.screen.changeCursor(False)
+	import atexit
+	atexit.register(lambda: layout.screen.changeCursor(True))
+
 	libs = getDependencies(libs)
 
 	lib_instances = {}
