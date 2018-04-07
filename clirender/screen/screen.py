@@ -59,6 +59,9 @@ class Screen(object):
 	def moveCursor(self, x, y):
 		self.write("\x1b[%d;%dH" % (y + 1, x + 1))
 
+	def changeCursor(self, visible):
+		self.write("\033[?25" + ("h" if visible else "l"))
+
 	def printAt(self, text, x, y):
 		self.moveCursor(int(x), int(y))
 		self.write(text)
