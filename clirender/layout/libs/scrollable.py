@@ -1,5 +1,7 @@
 from library import Library
 from ..nodes import Generator, Node
+from ..api import NodeAPI
+from ..patch import patch
 import operator
 
 class Scrollable(Library):
@@ -34,3 +36,36 @@ class Scrollable(Library):
 			)
 
 			return map(operator.sub, rendered, (self.x, self.y))
+
+	@patch(NodeAPI)
+	class NodeAPI(object):
+		def scrollIntoView(self, coords=["x", "y"]):
+			try:
+				if not self.isNode():
+					raise self._unexpectedType("scrollIntoView()")
+
+				boundaryBox = self.getBoundaryBox()
+
+				root = self.nearest(lambda node: node.nodeName == "Scrolled")
+				rootBoundaryBox = root.getBoundaryBox()
+
+				# Thanks to https://github.com/litera/jquery-scrollintoview/blob/master/jquery.scrollintoview.js
+				rel = dict(
+					top=boundaryBox["top"] - rootBoundaryBox["top"],
+					bottom=rootBoundaryBox["bottom"] - boundaryBox["bottom"],
+					left=boundaryBox["left"] - rootBoundaryBox["left"],
+					right=rootBoundaryBox["right"] - boundaryBox["right"]
+				)
+
+				if "y" in coords:
+					if rel["top"] < 0:
+						root["y"] += rel["top"]
+					elif rel["top"] > 0 and rel["bottom"] < 0:
+						root["y"] += min(rel["top"], -rel["bottom"])
+				if "x" in coords:
+					if rel["left"] < 0:
+						root["x"] += rel["left"]
+					elif rel["left"] > 0 and rel["right"] < 0:
+						root["x"] += min(rel["left"], -rel["right"])
+			except Exception, e:
+				print e
