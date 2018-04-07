@@ -101,6 +101,8 @@ class Node(object):
 		child._completely_revoked = completely_revoked
 
 		sizes = child.render(dry_run=dry_run)
+		child._revoked = False
+
 		child.cache_sizes = sizes
 		child.cache_offset = offset
 		child.cache_plus_size = plus_size
