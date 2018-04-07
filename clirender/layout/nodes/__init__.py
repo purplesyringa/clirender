@@ -5,3 +5,7 @@ from switch import *
 from container import *
 from alignright import *
 from fromxml import *
+
+from node import *
+from generator import *
+from element import *
