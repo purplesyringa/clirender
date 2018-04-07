@@ -17,5 +17,7 @@ class Container(Node):
 			boundary_right_bottom=self.render_boundary_right_bottom,
 			parent_width=self.render_parent_width,
 			parent_height=self.render_parent_height,
-			stretch=self.render_stretch
+			stretch=self.render_stretch,
+
+			completely_revoked=self._completely_revoked
 		)
