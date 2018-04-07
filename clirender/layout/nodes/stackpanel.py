@@ -131,7 +131,7 @@ class StackPanel(Rect):
 						# rerender completely?
 						if child._render_cache != (cur_x, cur_y):
 							rerender = "this"
-				elif child._revoked:
+				elif child._revoked and not self._completely_revoked:
 					rerender = "maybe"
 
 			try:
