@@ -10,7 +10,7 @@ class TabSwitch(Library):
 		super(TabSwitch, self).__init__(layout)
 
 		self.focusable = []
-		self.focused_id = 0
+		self.focused = None
 
 	def loop(self, instances):
 		key = instances["KeyPress"].getKey()
@@ -18,34 +18,35 @@ class TabSwitch(Library):
 			self.tab(instances, backward=False)
 		elif key == Ctrl(KeyCodes.Tab): # Ctrl+Tab
 			self.tab(instances, backward=True)
+		else:
+			if self.focused:
+				self.focused.emit("keyPress", recursive=True, key=key)
 
 	def tab(self, instances, backward=False):
-		if self.focused_id >= len(self.focusable):
-			self.focused_id = 0
-
-		if self.focused_id >= len(self.focusable):
+		if len(self.focusable) == 0:
 			return
 
-		old = self.focusable[self.focused_id]
+		old = self.focused or self.focusable[0]
+		index = self.focusable.index(old)
 
 		if backward:
-			self.focused_id -= 1
-			if self.focused_id < 0:
-				self.focused_id = len(self.focusable) - 1
+			index -= 1
+			if index < 0:
+				index = len(self.focusable) - 1
 		else:
-			self.focused_id += 1
-			if self.focused_id >= len(self.focusable):
-				self.focused_id = 0
+			index += 1
+			if index >= len(self.focusable):
+				index = 0
 
-		new = self.focusable[self.focused_id]
+		self.focused = self.focusable[index]
 
 
 		if "Events" in instances:
-			old.emit("blur", new=new)
-			new.emit("focus", old=old)
+			old         .emit("blur",  new=self.focused)
+			self.focused.emit("focus", old=old         )
 
-		old.revoke()
-		new.revoke()
+		old         .revoke()
+		self.focused.revoke()
 
 	class Focusable(Generator):
 		container = True
@@ -61,6 +62,9 @@ class TabSwitch(Library):
 			if len(self.children) != 1:
 				raise ValueError("<Focusable> can contain only one node")
 
+
+			TabSwitchInstance = self.layout.libs["TabSwitch"]
+
 			slots = dict(**self.slots)
-			slots["focused"] = "True" if self.layout.libs["TabSwitch"].focusable.index(self) == self.layout.libs["TabSwitch"].focused_id else "False"
+			slots["focused"] = self is (TabSwitchInstance.focused or TabSwitchInstance.focusable[0])
 			return handleElement(self.children[0], self.defines, slots, additional_nodes=self.additional_nodes, global_slots=self.global_slots)
