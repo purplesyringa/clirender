@@ -5,7 +5,7 @@ class Generator(Element):
 	text_container = False
 
 	def __init__(self, slots, children=[], **kwargs):
-		super(Generator, self).__init__()
+		super(Generator, self).__init__(**kwargs)
 
 		self.children = children
 		self.slots = slots

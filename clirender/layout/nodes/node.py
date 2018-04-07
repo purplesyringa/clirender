@@ -5,7 +5,7 @@ class Node(Element):
 	text_container = False
 
 	def __init__(self, children=None, value=[], **kwargs):
-		super(Node, self).__init__()
+		super(Node, self).__init__(**kwargs)
 
 		self.render_offset = (None, None)
 		self.render_plus_size = (None, None)
