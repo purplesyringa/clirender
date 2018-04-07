@@ -84,3 +84,8 @@ class TabSwitch(Library):
 			slots = dict(**self.slots)
 			slots["focused"] = self is TabSwitchInstance.getFocused()
 			return handleElement(self.children[0], self.defines, slots, additional_nodes=self.additional_nodes, global_slots=self.global_slots)
+
+		def onDestroy(self):
+			lst = self.layout.libs["TabSwitch"]._focusable
+			if self in lst:
+				lst.remove(self)
