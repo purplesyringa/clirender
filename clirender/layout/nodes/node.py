@@ -122,3 +122,12 @@ class Node(object):
 			width=self.cache_sizes[0],
 			height=self.cache_sizes[1]
 		)
+
+
+	def destroy(self):
+		if self.container:
+			for child in self._children:
+				child.destroy()
+
+		if hasattr(self, "onDestroy"):
+			self.onDestroy()

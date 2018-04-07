@@ -31,9 +31,22 @@ class Generator(object):
 
 
 	def revoke(self):
+		if self._cached is not None:
+			for child in self._cached:
+				child.destroy()
+
 		self._cached = None
 
 		node = self.parent
 		while node is not None:
 			node._revoked = True
 			node = node.parent
+
+
+	def destroy(self):
+		if self._cached is not None:
+			for child in self._cached:
+				child.destroy()
+
+		if hasattr(self, "onDestroy"):
+			self.onDestroy()
