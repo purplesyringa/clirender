@@ -22,7 +22,7 @@ class Generator(Element):
 
 	def generate(self):
 		if not self._initted:
-			self.init(**self._kwargs)
+			self.runInit(**self._kwargs)
 			self._initted = True
 
 		if self._cached is None:

@@ -28,6 +28,8 @@ class Node(Element):
 		self._kwargs = kwargs
 		self._initted = False
 
+		self.runInit(**self._kwargs)
+
 	@property
 	def children(self):
 		return self._get_children(self._children, self)
@@ -60,15 +62,11 @@ class Node(Element):
 		return children
 
 
-	def init(self):
-		pass
-
 	def onRender(self, *args, **kwargs):
 		raise NotImplementedError
 
 	def render(self, cls=None, **kwargs):
 		if not self._initted:
-			self.init(**self._kwargs)
 			self._initted = True
 
 		obj = self if cls is None else super(cls, self)

@@ -6,7 +6,7 @@ from ..api import createAPI
 class Events(Library):
 	@patch(Node, Generator)
 	class Node(object):
-		def __init__(self, **kwargs):
+		def init(self, **kwargs):
 			self._events = {}
 
 			for name, handler in kwargs.items():
@@ -21,7 +21,8 @@ class Events(Library):
 
 					self.on(event, handler)
 
-			patch.super(self).__init__(**kwargs)
+			return kwargs
+
 
 		def on(self, event, handler):
 			if event not in self._events:

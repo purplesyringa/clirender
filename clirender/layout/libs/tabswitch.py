@@ -67,7 +67,7 @@ class TabSwitch(Library):
 		text_container = False
 		properties = []
 
-		def init(self, disabled=False, **kwargs):
+		def init(self, disabled=False):
 			self.disabled = disabled != False
 
 			self.layout.libs["TabSwitch"]._focusable.append(self)

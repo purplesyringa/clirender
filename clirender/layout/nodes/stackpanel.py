@@ -8,15 +8,15 @@ class StackPanel(Rect):
 	text_container = False
 	properties = ["orientation", "hspacing", "wspacing", "optimize"]
 
-	def __init__(self, width=None, height=None, bg=None, orientation="horizontal", hspacing=0, wspacing=0, optimize="safe", children=[], **kwargs):
-		super(StackPanel, self).__init__(width=width, height=height, bg=bg, children=children, **kwargs)
-
+	def init(self, width=None, height=None, orientation="horizontal", hspacing=0, wspacing=0, optimize="safe"):
 		self.orientation = orientation
 		self.hspacing = hspacing
 		self.wspacing = wspacing
 		self.optimize = optimize
 
 		self._render_cache = None
+
+		return dict(width=width, height=height)
 
 	def onRender(self, dry_run=False):
 		if self.optimize != "no":
