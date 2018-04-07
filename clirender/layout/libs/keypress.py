@@ -1,4 +1,4 @@
-from library import Library
+from library import Library, Slot
 import os
 
 
@@ -186,3 +186,16 @@ class KeyPress(Library):
 		if self.key is None:
 			self.loop(self.instances)
 		return self.key
+
+
+	@Slot("KeyCodes", wrapped=True)
+	def KeyCodes(slots):
+		return KeyCodes
+
+	@Slot("Ctrl", wrapped=True)
+	def Ctrl(slots):
+		return Ctrl
+
+	@Slot("Shift", wrapped=True)
+	def Shift(slots):
+		return Shift
