@@ -21,7 +21,7 @@ class Events(Library):
 
 					self.on(event, handler)
 
-			return kwargs
+			patch.super(Events.Element, self).init(**kwargs)
 
 
 		def on(self, event, handler):
