@@ -100,6 +100,20 @@ class NodeAPI(object):
 		return ValueError("%s: Not defined on %s" % (callee, type(node)))
 
 
+class LayoutAPI(object):
+	def __getattr__(self, name):
+		layout = storage[self]
+		if name == "root":
+			return createAPI(layout.root)
+		else:
+			return getattr(layout, name)
+
+	@property
+	def root(self):
+		layout = storage[self]
+		return createAPI(layout.root)
+
+
 # storage[self] is a way to simulate private scope, so that Node or Generator
 # couldn't be accessed from outside
 storage = dict()
@@ -111,3 +125,12 @@ def createAPI(node):
 			super(LocalNodeAPI, self).__init__()
 
 	return LocalNodeAPI()
+
+
+def createLayoutAPI(layout):
+	class LocalLayoutAPI(LayoutAPI):
+		def __init__(self):
+			storage[self] = layout
+			super(LocalLayoutAPI, self).__init__()
+
+	return LocalLayoutAPI()
