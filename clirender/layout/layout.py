@@ -7,11 +7,19 @@ from exceptions import NoStretchError
 from safe_eval import safeEval
 
 class Layout(object):
-	def __init__(self, root):
+	def __init__(self, root=None):
 		self.screen = Screen()
 		self.root = root
 
+	def bind(self, root):
+		self.root = root
+	def unbind(self):
+		self.root = None
+
 	def render(self, force=False, clear=True):
+		if self.root is None:
+			raise ValueError("Cannot render layout without root node")
+
 		if clear:
 			self.screen.clear()
 
