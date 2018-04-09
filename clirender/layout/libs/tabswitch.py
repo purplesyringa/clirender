@@ -68,9 +68,29 @@ class TabSwitch(Library):
 		properties = ["disabled"]
 
 		def init(self, disabled=False):
-			self.disabled = disabled != False
+			self._disabled = disabled != False
 
 			self.layout.libs["TabSwitch"]._focusable.append(self)
+
+
+		@property
+		def disabled(self):
+			return self._disabled
+
+		@disabled.setter
+		def disabled(self, value):
+			TabSwitchInstance = self.layout.libs["TabSwitch"]
+
+			if value == True:
+				if self is TabSwitchInstance.getFocused():
+					# Disable current focused
+					self._disabled = True
+
+					# Revoke new focused
+					TabSwitchInstance.getFocused().revoke()
+
+			self._disabled = bool(value)
+
 
 		def onGenerate(self):
 			from ..xml_parser import handleElement
