@@ -102,7 +102,7 @@ def fromXml(code, additional_nodes={}, global_slots={}):
 	return handleElement(root, defines, slots={}, additional_nodes=additional_nodes, global_slots=global_slots)[0]
 
 def handleElement(node, defines, slots, additional_nodes, global_slots):
-	if node.tag in ["Define", "Use", "Global"]:
+	if node.tag in ["Define", "Use", "Global", "Method"]:
 		return []
 	elif node.tag is etree.Comment:
 		return []
@@ -138,6 +138,17 @@ def handleElement(node, defines, slots, additional_nodes, global_slots):
 				attr += "_"
 
 			attrs[attr] = value
+
+
+	# Methods
+	for method in node:
+		if method.tag != "Method":
+			continue
+		elif "name" not in method.attrib:
+			raise ValueError("Method without name")
+
+		attrs[method.attrib["name"]] = evaluatable(method.attrib["name"], method.text, global_slots=global_slots)
+
 
 	ctor = getattr(nodes, node.tag, None)
 	if ctor is None:
