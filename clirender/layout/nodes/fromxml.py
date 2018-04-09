@@ -41,6 +41,12 @@ def fromXml(elem, slots, name, defines, container, additional_nodes, global_slot
 				if isinstance(slot, NoDefault):
 					raise ValueError("Required slot :%s not passed" % slot)
 
+
+			# Set some special slots
+			cur_slots["__name__"] = name
+			cur_slots["__root__"] = id(elem)
+
+
 			items = handleElement(elem, defines=defines, slots=cur_slots, additional_nodes=additional_nodes, global_slots=global_slots)
 			if len(items) != 1:
 				raise ValueError("<Define> must contain exactly one node")
