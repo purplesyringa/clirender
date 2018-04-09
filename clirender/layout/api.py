@@ -99,10 +99,7 @@ class NodeAPI(object):
 class LayoutAPI(object):
 	def __getattr__(self, name):
 		layout = storage[self]
-		if name == "root":
-			return createAPI(layout.root)
-		else:
-			return getattr(layout, name)
+		return getattr(layout, name)
 
 	@property
 	def root(self):
