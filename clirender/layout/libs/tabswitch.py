@@ -87,7 +87,10 @@ class TabSwitch(Library):
 					self._disabled = True
 
 					# Revoke new focused
-					TabSwitchInstance.getFocused().revoke()
+					focused = TabSwitchInstance.getFocused()
+					if focused is not None:
+						# Has something to focus at all
+						focused.revoke()
 
 			self._disabled = bool(value)
 
