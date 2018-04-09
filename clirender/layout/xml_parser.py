@@ -226,6 +226,10 @@ def getTextInside(node, slots, global_slots, allow_nodes=False):
 
 
 def evaluatable(name, expr, global_slots):
+	# expr isn't docstring, but its syntax is very similar
+	import inspect
+	expr = inspect.cleandoc(expr)
+
 	def func(*args, **kwargs):
 		for pos, value in enumerate(args):
 			kwargs["arg" + str(pos)] = value
