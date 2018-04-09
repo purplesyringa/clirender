@@ -11,6 +11,7 @@ class Query(Library):
 			patch.super(Query.Layout, self).__init__(*args, **kwargs)
 			self._byTagName = {}
 			self._byDefineName = {}
+			self._byRef = {}
 
 	@patch(Element)
 	class Element(object):
@@ -21,6 +22,10 @@ class Query(Library):
 				self.layout._byTagName[tag] = []
 			self.layout._byTagName[tag].append(self)
 
+			if "ref" in kwargs:
+				self.layout._byRef[kwargs["ref"]] = self
+
+
 			# <Define>
 			if id(self.elem) == self.slots.get("__root__", None):
 				name = self.slots["__name__"]
@@ -28,6 +33,12 @@ class Query(Library):
 					self.layout._byDefineName[name] = []
 				self.layout._byDefineName[name].append(self)
 
+				if "ref" in kwargs:
+					self.layout._byRef[kwargs["ref"]] = self
+
+
+			if "ref" in kwargs:
+				del kwargs["ref"]
 
 			patch.super(Query.Element, self).init(**kwargs)
 
@@ -51,3 +62,6 @@ class Query(Library):
 
 		def byDefineName(self, name):
 			return [createAPI(node) for node in self._byDefineName.get(name, [])]
+
+		def byRef(self, ref):
+			return createAPI(self._byRef.get(ref, None))
