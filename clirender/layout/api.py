@@ -13,7 +13,7 @@ class NodeAPI(object):
 	def childNodes(self):
 		node = storage[self]
 		if isinstance(node, Node):
-			return map(createAPI, node._children)
+			return map(createAPI, node.children)
 		elif isinstance(node, Generator):
 			return map(createAPI, node.generate())
 		else:
