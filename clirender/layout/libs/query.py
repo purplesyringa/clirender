@@ -20,10 +20,10 @@ class Query(Library):
 			tag = type(self).__name__
 			if tag not in self.layout._byTagName:
 				self.layout._byTagName[tag] = []
-			self.layout._byTagName[tag].append(self)
+			self.layout._byTagName[tag].append(createAPI(self))
 
 			if "ref" in kwargs:
-				self.layout._byRef[kwargs["ref"]] = self
+				self.layout._byRef[kwargs["ref"]] = createAPI(self)
 
 
 			# <Define>
@@ -31,7 +31,7 @@ class Query(Library):
 				name = self.slots["__name__"]
 				if name not in self.layout._byDefineName:
 					self.layout._byDefineName[name] = []
-				self.layout._byDefineName[name].append(self)
+				self.layout._byDefineName[name].append(createAPI(self))
 
 				if "ref" in kwargs:
 					self.layout._byRef[kwargs["ref"]] = self
@@ -45,12 +45,12 @@ class Query(Library):
 		def destroy(self):
 			# Normal tags
 			tag = type(self).__name__
-			self.layout._byTagName[tag].remove(self)
+			self.layout._byTagName[tag].remove(createAPI(self))
 
 			# <Define>
 			if id(self.elem) == self.slots.get("__root__", None):
 				name = self.slots["__name__"]
-				self.layout._byDefineName[name].remove(self)
+				self.layout._byDefineName[name].remove(createAPI(self))
 
 
 			patch.super(Query.Element, self).destroy()
@@ -58,10 +58,10 @@ class Query(Library):
 	@patch(LayoutAPI)
 	class LayoutAPI(object):
 		def byTagName(self, name):
-			return [createAPI(node) for node in self._byTagName.get(name, [])]
+			return self._byTagName.get(name, [])
 
 		def byDefineName(self, name):
-			return [createAPI(node) for node in self._byDefineName.get(name, [])]
+			return self._byDefineName.get(name, [])
 
 		def byRef(self, ref):
-			return createAPI(self._byRef.get(ref, None))
+			return self._byRef.get(ref, None)
