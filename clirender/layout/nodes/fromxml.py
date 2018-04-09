@@ -12,6 +12,12 @@ def fromXml(elem, slots, name, defines, container, additional_nodes, global_slot
 
 			del attrs["elem"]
 
+			if "ref" in attrs:
+				ref = attrs["ref"]
+				del attrs["ref"]
+			else:
+				ref = None
+
 			if cls.text_container:
 				attrs[""] = attrs["value"]
 				del attrs["value"]
@@ -45,6 +51,7 @@ def fromXml(elem, slots, name, defines, container, additional_nodes, global_slot
 			# Set some special slots
 			cur_slots["__name__"] = name
 			cur_slots["__root__"] = id(elem)
+			cur_slots["__ref__"] = ref
 
 
 			items = handleElement(elem, defines=defines, slots=cur_slots, additional_nodes=additional_nodes, global_slots=global_slots)
