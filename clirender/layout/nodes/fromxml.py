@@ -10,6 +10,8 @@ def fromXml(elem, slots, name, defines, container, additional_nodes, global_slot
 		def __new__(cls, **attrs):
 			from ..xml_parser import handleElement
 
+			del attrs["elem"]
+
 			if cls.text_container:
 				attrs[""] = attrs["value"]
 				del attrs["value"]

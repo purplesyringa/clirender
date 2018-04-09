@@ -4,7 +4,7 @@ class Node(Element):
 	container = False
 	text_container = False
 
-	def __init__(self, children=None, value=[], slots={}, **kwargs):
+	def __init__(self, slots, elem, children=None, value=[], **kwargs):
 		super(Node, self).__init__()
 
 		self.render_offset = (None, None)
@@ -20,6 +20,7 @@ class Node(Element):
 		self._children = children
 		self.value = value
 		self.slots = slots
+		self.elem = elem
 		self._revoked = False
 		self._completely_revoked = False
 		self._changed = False

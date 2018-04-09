@@ -4,11 +4,12 @@ class Generator(Element):
 	container = False
 	text_container = False
 
-	def __init__(self, slots, children=[], **kwargs):
+	def __init__(self, slots, elem, children=[], **kwargs):
 		super(Generator, self).__init__()
 
 		self.children = children
 		self.slots = slots
+		self.elem = elem
 
 		self.parent = None
 		self.gen_parent = None

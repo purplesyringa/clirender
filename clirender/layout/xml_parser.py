@@ -154,7 +154,7 @@ def handleElement(node, defines, slots, additional_nodes, global_slots):
 	if ctor.text_container:
 		text_inside = getTextInside(node, slots=slots, global_slots=global_slots)
 
-		result = ctor(value=text_inside, slots=slots, **attrs)
+		result = ctor(value=text_inside, slots=slots, elem=node, **attrs)
 	elif ctor.container:
 		text_inside = getTextInside(node, slots=slots, global_slots=global_slots, allow_nodes=True)
 		if text_inside.strip() != "":
@@ -164,14 +164,14 @@ def handleElement(node, defines, slots, additional_nodes, global_slots):
 		for child in node:
 			children += handleElement(child, defines, slots, additional_nodes=additional_nodes, global_slots=global_slots)
 
-		result = ctor(children=children, slots=slots, **attrs)
+		result = ctor(children=children, slots=slots, elem=node, **attrs)
 	else:
 		if len(node) > 0:
 			raise ValueError("Nodes inside <%s>" % node.tag)
 		elif node.text is not None and node.text.strip() != "":
 			raise ValueError("Text inside <%s>" % node.tag)
 
-		result = ctor(slots=slots, **attrs)
+		result = ctor(slots=slots, elem=node, **attrs)
 
 	result.slots = slots
 	result.defines = defines
@@ -181,11 +181,11 @@ def handleElement(node, defines, slots, additional_nodes, global_slots):
 
 def handleGenerator(node, defines, slots, ctor, attrs, inheritable, additional_nodes, global_slots):
 	if ctor.text_container:
-		node = ctor(value=getTextInside(node, slots, global_slots=global_slots, allow_nodes=False), slots=slots, **attrs)
+		node = ctor(value=getTextInside(node, slots, global_slots=global_slots, allow_nodes=False), slots=slots, elem=node, **attrs)
 	elif ctor.container:
-		node = ctor(children=list(node), slots=slots, **attrs)
+		node = ctor(children=list(node), slots=slots, elem=node, **attrs)
 	else:
-		node = ctor(slots=slots, **attrs)
+		node = ctor(slots=slots, elem=node, **attrs)
 
 	node.defines = defines
 	node.additional_nodes = additional_nodes
