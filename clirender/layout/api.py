@@ -110,20 +110,29 @@ class LayoutAPI(object):
 # storage[self] is a way to simulate private scope, so that Node or Generator
 # couldn't be accessed from outside
 storage = dict()
+cached_api = dict()
 
 def createAPI(node):
+	if node in cached_api:
+		return cached_api[node]
+
 	class LocalNodeAPI(NodeAPI):
 		def __init__(self):
 			storage[self] = node
 			super(LocalNodeAPI, self).__init__()
 
-	return LocalNodeAPI()
+	cached_api[node] = LocalNodeAPI()
+	return cached_api[node]
 
 
 def createLayoutAPI(layout):
+	if layout in cached_api:
+		return cached_api[layout]
+
 	class LocalLayoutAPI(LayoutAPI):
 		def __init__(self):
 			storage[self] = layout
 			super(LocalLayoutAPI, self).__init__()
 
-	return LocalLayoutAPI()
+	cached_api[layout] = LocalLayoutAPI()
+	return cached_api[layout]
