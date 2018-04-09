@@ -10,16 +10,6 @@ class NodeAPI(object):
 
 
 	@property
-	def childNodes(self):
-		node = storage[self]
-		if isinstance(node, Node):
-			return map(createAPI, node.children)
-		elif isinstance(node, Generator):
-			return map(createAPI, node.generate())
-		else:
-			raise self._unexpectedType("childNodes")
-
-	@property
 	def children(self):
 		node = storage[self]
 		if isinstance(node, Node):
