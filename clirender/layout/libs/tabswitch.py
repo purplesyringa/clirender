@@ -65,7 +65,7 @@ class TabSwitch(Library):
 	class Focusable(Generator):
 		container = True
 		text_container = False
-		properties = []
+		properties = ["disabled"]
 
 		def init(self, disabled=False):
 			self.disabled = disabled != False
