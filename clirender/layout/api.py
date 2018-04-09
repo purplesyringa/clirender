@@ -89,7 +89,13 @@ class NodeAPI(object):
 			raise ValueError("[]: %s is not a property" % name)
 		setattr(node, name, value)
 
-		node._changed = True
+		if isinstance(node, Generator):
+			node._cached = None
+		elif isinstance(node, Node):
+			node._changed = True
+		else:
+			raise self._unexpectedType("[]")
+
 		while node is not None:
 			node._revoked = True
 			node = node.parent
