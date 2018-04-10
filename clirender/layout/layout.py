@@ -71,6 +71,8 @@ class Layout(object):
 				data["stretch"] = stretch
 
 			return safeEval(size, data)
-		except KeyError as e:
-			if e.args[0] == "stretch":
+		except NameError, e:
+			if e.message.split("'")[1] == "stretch":
 				raise NoStretchError()
+
+			raise e
