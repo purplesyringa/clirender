@@ -57,6 +57,10 @@ def fromXml(elem, slots, name, defines, container, additional_nodes, global_slot
 			items = handleElement(elem, defines=defines, slots=cur_slots, additional_nodes=additional_nodes, global_slots=global_slots)
 			if len(items) != 1:
 				raise ValueError("<Define> must contain exactly one node")
+
+			if ref is not None:
+				items[0].refs.append(ref)
+
 			return items[0]
 
 	FromXml.text_container = container == "text"
