@@ -217,7 +217,10 @@ def getTextInside(node, slots, global_slots, allow_nodes=False):
 
 	for item in node.xpath("child::node()"):
 		if isinstance(item, (str, unicode)):
-			text += item
+			if isinstance(item, unicode):
+				text += item.encode("utf-8")
+			else:
+				text += item
 
 			if allow_nodes is None and text.strip() != "" and had_nodes:
 				raise ValueError("Nodes and text inside <%s>" % node.tag)
@@ -227,7 +230,10 @@ def getTextInside(node, slots, global_slots, allow_nodes=False):
 			name = item.attrib.get("name", "")
 			value = evaluate(name, slots=slots, global_slots=global_slots)
 			if not isinstance(value, (nodes.Node, nodes.Generator)):
-				text += str(value)
+				if isinstance(value, unicode):
+					text += value.encode("utf-8")
+				else:
+					text += str(value)
 			elif allow_nodes is None and had_nodes:
 				raise ValueError("Nodes and text inside <%s>" % node.tag)
 			elif allow_nodes is False:
