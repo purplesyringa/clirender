@@ -3,18 +3,32 @@ from node import Node
 class Text(Node):
 	container = False
 	text_container = True
-	properties = ["width", "bg", "color", "bright", "fill"]
+	properties = ["width", "bg", "color", "bright", "fill", "wrap"]
 
-	def init(self, width=None, height=None, bg=None, color=None, bright=False, fill=False):
+	def init(self, width=None, height=None, bg=None, color=None, bright=False, fill=False, wrap=False):
 		self.width = width
 		self.height = height
 		self.bg = bg
 		self.color = color
 		self.bright = bright is not False
 		self.fill = fill is not False
+		self.wrap = wrap is not False
 
 	def onRender(self, dry_run=False):
-		lines = self.value.split("\n")
+		if self.wrap:
+			if self.width is not None:
+				width = self.width
+				width = self.layout.calcRelativeSize(width, self.render_parent_width, self.render_stretch)
+			else:
+				width = max(self.render_boundary_right_bottom[0] - self.render_offset[0], 0)
+
+			if int(width) == 0:
+				lines = []
+			else:
+				import textwrap
+				lines = textwrap.wrap(self.value, width=int(width))
+		else:
+			lines = self.value.split("\n")
 
 		if self.width is not None:
 			width = self.width
