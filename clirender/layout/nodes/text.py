@@ -14,17 +14,19 @@ class Text(Node):
 		self.fill = fill is not False
 
 	def onRender(self, dry_run=False):
+		lines = self.value.split("\n")
+
 		if self.width is not None:
 			width = self.width
 			width = self.layout.calcRelativeSize(width, self.render_parent_width, self.render_stretch)
 		else:
-			width = len(self.value)
+			width = max(len(line) for line in lines)
 
 		if self.height is not None:
 			height = self.height
 			height = self.layout.calcRelativeSize(height, self.render_parent_height, self.render_stretch)
 		else:
-			height = 1
+			height = len(lines)
 
 		width += self.render_plus_size[0]
 		height += self.render_plus_size[1]
@@ -32,17 +34,18 @@ class Text(Node):
 		x, y = self.render_offset
 
 
-		text = self.value[:int(width)]
+		lines = [line[:int(width)] for line in lines]
 		cwidth, cheight = width, height
 
 		# Left boundary
-		text = text[int(max(self.render_boundary_left_top[0] - x, 0)):]
+		pos = max(self.render_boundary_left_top[0] - x, 0)
+		lines = [line[int(pos):] for line in lines]
 		x = max(x, self.render_boundary_left_top[0])
 
 		# Right boundary
 		pos = max(x + cwidth - self.render_boundary_right_bottom[0], 0)
 		if pos > 0:
-			text = text[:-int(pos)]
+			lines = [line[:cwidth-int(pos)] for line in lines]
 		cwidth = min(cwidth, self.render_boundary_right_bottom[0] - x)
 
 		# Top boundary
@@ -69,7 +72,8 @@ class Text(Node):
 				if self.fill:
 					self.layout.screen.fill(x, y, x + cwidth, y + cheight, char=self.value, style=lambda s: self.layout.screen.colorize(s, bg=bg, fg=color, bright=bright))
 				else:
-					self.layout.screen.printAt(self.layout.screen.colorize(text, bg=bg, fg=color, bright=self.bright), x, y)
-					self.layout.screen.printAt(self.layout.screen.colorize(" " * int(cwidth - len(text)), bg=bg), x + len(text), y)
+					for i, line in enumerate(lines):
+						self.layout.screen.printAt(self.layout.screen.colorize(line, bg=bg, fg=color, bright=self.bright), x, y + i)
+						self.layout.screen.printAt(self.layout.screen.colorize(" " * int(cwidth - len(line)), bg=bg), x + len(line), y + i)
 
 		return width, height
