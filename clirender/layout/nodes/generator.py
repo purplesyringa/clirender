@@ -4,8 +4,8 @@ class Generator(Element):
 	container = False
 	text_container = False
 
-	def __init__(self, slots, elem, children=[], **kwargs):
-		super(Generator, self).__init__()
+	def __init__(self, slots, elem, children=[], ref=None, **kwargs):
+		super(Generator, self).__init__(ref=ref)
 
 		self.children = children
 		self.slots = slots

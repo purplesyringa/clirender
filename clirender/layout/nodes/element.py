@@ -1,8 +1,8 @@
 import inspect # magic
 
 class Element(object):
-	def __init__(self):
-		pass
+	def __init__(self, ref):
+		self.refs = [ref] if bool(ref) else []
 
 
 	def init(self):

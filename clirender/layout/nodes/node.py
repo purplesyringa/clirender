@@ -4,8 +4,8 @@ class Node(Element):
 	container = False
 	text_container = False
 
-	def __init__(self, slots, elem, children=None, value=[], **kwargs):
-		super(Node, self).__init__()
+	def __init__(self, slots, elem, children=None, value=[], ref=None, **kwargs):
+		super(Node, self).__init__(ref=ref)
 
 		self.render_offset = (None, None)
 		self.render_plus_size = (None, None)
