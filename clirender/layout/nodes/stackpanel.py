@@ -161,11 +161,11 @@ class StackPanel(Rect):
 
 		if self.orientation == "vertical":
 			if not row_column_has_stretch_problems:
-				rows_columns_no_stretch.append((max_width, cur_y - y1))
+				rows_columns_no_stretch.append(cur_y - y1)
 			rows_columns.append((max_width, cur_y - y1))
 		else:
 			if not row_column_has_stretch_problems:
-				rows_columns_no_stretch.append((cur_x - x1, max_height))
+				rows_columns_no_stretch.append(cur_x - x1)
 			rows_columns.append((cur_x - x1, max_height))
 
 		if len(rows_columns_no_stretch) < len(rows_columns):
