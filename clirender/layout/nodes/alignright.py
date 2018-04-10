@@ -3,7 +3,12 @@ from rect import Rect
 class AlignRight(Rect):
 	container = True
 	text_container = False
-	properties = ["height"]
+	properties = ["width", "height", "bg"]
+
+	def init(self, **kwargs):
+		if "height" not in kwargs:
+			kwargs["height"] = None
+		return kwargs
 
 	def onRender(self, dry_run=False):
 		if len(self.children) != 1:
