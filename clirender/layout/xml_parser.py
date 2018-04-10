@@ -84,7 +84,6 @@ def fromXml(code, additional_nodes={}, global_slots={}):
 
 	# Handle <Global>
 	global_nodes = root.findall("Global")
-	additional_global_slots = {}
 	for node in global_nodes:
 		for name, value in node.attrib.items():
 			# Set name=value
@@ -95,14 +94,22 @@ def fromXml(code, additional_nodes={}, global_slots={}):
 				name = name[1:]
 				value = evaluate(value, slots={}, global_slots=global_slots)
 
-			additional_global_slots[name] = value
+			global_slots[name] = value
 
-	global_slots.update(additional_global_slots)
+	# Handle <Function>
+	function_nodes = root.findall("Function")
+	for node in function_nodes:
+		if "name" not in node.attrib:
+			raise ValueError("Function without name")
+
+		name = node.attrib["name"]
+		value = evaluatable(name, node.text, global_slots=global_slots)
+		global_slots[name] = value
 
 	return handleElement(root, defines, slots={}, additional_nodes=additional_nodes, global_slots=global_slots)[0]
 
 def handleElement(node, defines, slots, additional_nodes, global_slots):
-	if node.tag in ["Define", "Use", "Global", "Method"]:
+	if node.tag in ["Define", "Use", "Global", "Method", "Function"]:
 		return []
 	elif node.tag is etree.Comment:
 		return []
