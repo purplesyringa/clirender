@@ -159,6 +159,15 @@ class StackPanel(Rect):
 			else:
 				cur_x += child_width + wspacing
 
+		if self.orientation == "vertical":
+			if not row_column_has_stretch_problems:
+				rows_columns_no_stretch.append((max_width, cur_y - y1))
+			rows_columns.append((max_width, cur_y - y1))
+		else:
+			if not row_column_has_stretch_problems:
+				rows_columns_no_stretch.append((cur_x - x1, max_height))
+			rows_columns.append((cur_x - x1, max_height))
+
 		if len(rows_columns_no_stretch) < len(rows_columns):
 			# Some rows/columns used 'stretch' variable, which was not calculated yet
 			if self.orientation == "vertical":
@@ -169,8 +178,6 @@ class StackPanel(Rect):
 			return self.renderChildren(width, height, dry_run=dry_run, stretch=stretch)
 
 		if self.orientation == "vertical":
-			rows_columns.append((max_width, cur_y - y1))
 			return sum(value[0] for value in rows_columns), max(value[1] for value in rows_columns), stretch
 		else:
-			rows_columns.append((cur_x - x1, max_height))
 			return max(value[0] for value in rows_columns), sum(value[1] for value in rows_columns), stretch
