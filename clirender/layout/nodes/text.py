@@ -31,9 +31,21 @@ class Text(Node):
 
 		x, y = self.render_offset
 
-		if not (self.render_boundary_left_top[0] <= x <= x + width <= self.render_boundary_right_bottom[0]):
-			return width, height
-		elif not (self.render_boundary_left_top[1] <= y <= y + height <= self.render_boundary_right_bottom[1]):
+
+		text = self.value[:int(width)]
+
+		# Left boundary
+		text = text[int(max(self.render_boundary_left_top[0] - x, 0)):]
+		x = max(x, self.render_boundary_left_top[0])
+
+		# Right boundary
+		pos = max(x + width - self.render_boundary_right_bottom[0], 0)
+		if pos > 0:
+			text = text[:-int(pos)]
+		width = min(width, self.render_boundary_right_bottom[0] - x)
+
+
+		if not (self.render_boundary_left_top[1] <= y <= y + height <= self.render_boundary_right_bottom[1]):
 			return width, height
 
 		bg = self.inherit("bg")
@@ -45,7 +57,7 @@ class Text(Node):
 				if self.fill:
 					self.layout.screen.fill(x, y, x + width, y + height, char=self.value, style=lambda s: self.layout.screen.colorize(s, bg=bg, fg=color, bright=bright))
 				else:
-					self.layout.screen.printAt(self.layout.screen.colorize(self.value, bg=bg, fg=color, bright=self.bright), x, y)
-					self.layout.screen.printAt(self.layout.screen.colorize(" " * int(width - len(self.value)), bg=bg), x + len(self.value), y)
+					self.layout.screen.printAt(self.layout.screen.colorize(text, bg=bg, fg=color, bright=self.bright), x, y)
+					self.layout.screen.printAt(self.layout.screen.colorize(" " * int(width - len(text)), bg=bg), x + len(text), y)
 
 		return width, height
