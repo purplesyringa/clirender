@@ -30,6 +30,9 @@ class Text(Node):
 		else:
 			lines = self.value.split("\n")
 
+		if lines == []:
+			lines = [""]
+
 		if self.width is not None:
 			width = self.width
 			width = self.layout.calcRelativeSize(width, self.render_parent_width, self.render_stretch)
