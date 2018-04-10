@@ -22,9 +22,6 @@ class Query(Library):
 				self.layout._byTagName[tag] = []
 			self.layout._byTagName[tag].append(createAPI(self))
 
-			if "ref" in kwargs:
-				self.layout._byRef[kwargs["ref"]] = createAPI(self)
-
 
 			# <Define>
 			if id(self.elem) == self.slots.get("__root__", None):
@@ -33,12 +30,12 @@ class Query(Library):
 					self.layout._byDefineName[name] = []
 				self.layout._byDefineName[name].append(createAPI(self))
 
-				if "ref" in kwargs:
-					self.layout._byRef[kwargs["ref"]] = self
 
-
-			if "ref" in kwargs:
-				del kwargs["ref"]
+			# refs
+			for ref in self.refs:
+				if ref in self.layout._byRef and self.layout._byRef[ref] != createAPI(self):
+					raise ValueError("Several nodes with same ref")
+				self.layout._byRef[ref] = createAPI(self)
 
 			patch.super(Query.Element, self).init(**kwargs)
 
@@ -52,6 +49,9 @@ class Query(Library):
 				name = self.slots["__name__"]
 				self.layout._byDefineName[name].remove(createAPI(self))
 
+			# refs
+			for ref in self.refs:
+				del self.layout._byRef[ref]
 
 			patch.super(Query.Element, self).destroy()
 
