@@ -170,10 +170,7 @@ class StackPanel(Rect):
 
 		if len(rows_columns_no_stretch) < len(rows_columns):
 			# Some rows/columns used 'stretch' variable, which was not calculated yet
-			if self.orientation == "vertical":
-				stretch = sum(rows_columns_no_stretch) + cur_y - y1
-			else:
-				stretch = sum(rows_columns_no_stretch) + cur_x - x1
+			stretch = max(rows_columns_no_stretch)
 
 			return self.renderChildren(width, height, dry_run=dry_run, stretch=stretch)
 
